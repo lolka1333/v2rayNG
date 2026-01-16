@@ -391,6 +391,20 @@ object Utils {
     }
 
     /**
+     * Get the device ID for HWID.
+     *
+     * @return The device ID.
+     */
+    fun getHardwareId(context: Context): String {
+        return try {
+            Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+        } catch (e: Exception) {
+            Log.e(AppConfig.TAG, "Failed to get HWID", e)
+            ""
+        }
+    }
+
+    /**
      * Get the dark mode status.
      *
      * @param context The context to use.

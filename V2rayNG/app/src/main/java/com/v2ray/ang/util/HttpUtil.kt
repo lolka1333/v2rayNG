@@ -142,6 +142,21 @@ object HttpUtil {
                 userAgent
             }
             conn.setRequestProperty("User-agent", finalUserAgent)
+
+            // Inject HWID headers for Remnawave
+            try {
+                val fakeHwid = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_FAKE_HWID)
+                val hwid = if (!fakeHwid.isNullOrEmpty()) fakeHwid else Utils.getHardwareId(com.v2ray.ang.AngApplication.application)
+                if (hwid.isNotEmpty()) {
+                    conn.setRequestProperty("X-HWID", hwid)
+                    conn.setRequestProperty("X-Device-OS", "android")
+                    conn.setRequestProperty("X-Ver-OS", android.os.Build.VERSION.RELEASE)
+                    conn.setRequestProperty("X-Device-Model", android.os.Build.MODEL)
+                }
+            } catch (e: Exception) {
+                Log.e(AppConfig.TAG, "Failed to set HWID headers", e)
+            }
+
             conn.connect()
 
             val responseCode = conn.responseCode
