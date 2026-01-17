@@ -143,44 +143,44 @@ object HttpUtil {
             }
             conn.setRequestProperty("User-agent", finalUserAgent)
 
-            // Inject HWID headers for Remnawave - DISABLED FOR DEBUGGING
-//            try {
-//                val isBypassEnabled = com.v2ray.ang.handler.MmkvManager.decodeSettingsBool(AppConfig.PREF_HWID_ENABLED, false)
-//                val realHwid = Utils.getHardwareId(com.v2ray.ang.AngApplication.application)
-//
-//                if (isBypassEnabled) {
-//                    val customHwid = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_VAL)
-//                    val hwidToSend = if (!customHwid.isNullOrEmpty()) customHwid else realHwid
-//
-//                    if (hwidToSend.isNotEmpty()) {
-//                        conn.setRequestProperty("X-HWID", hwidToSend)
-//                        
-//                        // Custom or Default OS
-//                        val customOs = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_OS)
-//                        val osToSend = if (!customOs.isNullOrEmpty()) customOs else Utils.getDeviceOS()
-//                        conn.setRequestProperty("X-Device-OS", osToSend)
-//
-//                        // Custom or Default OS Version
-//                        val customVer = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_OS_VER)
-//                        val verToSend = if (!customVer.isNullOrEmpty()) customVer else android.os.Build.VERSION.RELEASE
-//                        conn.setRequestProperty("X-Ver-OS", verToSend)
-//
-//                        // Custom or Default Model
-//                        val customModel = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_MODEL)
-//                        val modelToSend = if (!customModel.isNullOrEmpty()) customModel else Utils.getDeviceModel()
-//                        conn.setRequestProperty("X-Device-Model", modelToSend)
-//                    }
-//                } else {
-//                     if (realHwid.isNotEmpty()) {
-//                        conn.setRequestProperty("X-HWID", realHwid)
-//                        conn.setRequestProperty("X-Device-OS", Utils.getDeviceOS())
-//                        conn.setRequestProperty("X-Ver-OS", android.os.Build.VERSION.RELEASE)
-//                        conn.setRequestProperty("X-Device-Model", Utils.getDeviceModel())
-//                     }
-//                }
-//            } catch (e: Exception) {
-//                Log.e(AppConfig.TAG, "Failed to set HWID headers", e)
-//            }
+            // Inject HWID headers for Remnawave
+            try {
+                val isBypassEnabled = com.v2ray.ang.handler.MmkvManager.decodeSettingsBool(AppConfig.PREF_HWID_ENABLED, false)
+                val realHwid = Utils.getHardwareId(com.v2ray.ang.AngApplication.application)
+
+                if (isBypassEnabled) {
+                    val customHwid = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_VAL)
+                    val hwidToSend = if (!customHwid.isNullOrEmpty()) customHwid else realHwid
+
+                    if (hwidToSend.isNotEmpty()) {
+                        conn.setRequestProperty("X-HWID", hwidToSend)
+                        
+                        // Custom or Default OS
+                        val customOs = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_OS)
+                        val osToSend = if (!customOs.isNullOrEmpty()) customOs else Utils.getDeviceOS()
+                        conn.setRequestProperty("X-Device-OS", osToSend)
+
+                        // Custom or Default OS Version
+                        val customVer = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_OS_VER)
+                        val verToSend = if (!customVer.isNullOrEmpty()) customVer else android.os.Build.VERSION.RELEASE
+                        conn.setRequestProperty("X-Ver-OS", verToSend)
+
+                        // Custom or Default Model
+                        val customModel = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_MODEL)
+                        val modelToSend = if (!customModel.isNullOrEmpty()) customModel else Utils.getDeviceModel()
+                        conn.setRequestProperty("X-Device-Model", modelToSend)
+                    }
+                } else {
+                     if (realHwid.isNotEmpty()) {
+                        conn.setRequestProperty("X-HWID", realHwid)
+                        conn.setRequestProperty("X-Device-OS", Utils.getDeviceOS())
+                        conn.setRequestProperty("X-Ver-OS", android.os.Build.VERSION.RELEASE)
+                        conn.setRequestProperty("X-Device-Model", Utils.getDeviceModel())
+                     }
+                }
+            } catch (e: Exception) {
+                Log.e(AppConfig.TAG, "Failed to set HWID headers", e)
+            }
 
             conn.connect()
 

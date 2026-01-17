@@ -102,37 +102,43 @@ class SettingsActivity : BaseActivity() {
             findPreference<CheckBoxPreference>(AppConfig.PREF_HWID_ENABLED)?.setOnPreferenceChangeListener { _, newValue ->
                 val enabled = newValue as Boolean
                 if (enabled) {
-                    
-                    val hwidPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_VAL) as? EditTextPreference
-                    if (hwidPref != null && hwidPref.text.isNullOrEmpty()) {
-                        val realHwid = Utils.getHardwareId(requireContext())
-                        hwidPref.text = realHwid
-                        hwidPref.summary = realHwid
-                        MmkvManager.encodeSettings(AppConfig.PREF_HWID_VAL, realHwid)
-                    }
-                    
-                    val osPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_OS) as? ListPreference
-                    if (osPref != null && osPref.value == null) {
-                        val defaultOS = Utils.getDeviceOS()
-                        osPref.value = defaultOS
-                        osPref.summary = defaultOS
-                        MmkvManager.encodeSettings(AppConfig.PREF_HWID_OS, defaultOS)
-                    }
+                    // Execute initialization on the next UI frame to avoid conflicts with Preference dependency updates
+                    view?.post {
+                        try {
+                            val hwidPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_VAL) as? EditTextPreference
+                            if (hwidPref != null && hwidPref.text.isNullOrEmpty()) {
+                                val realHwid = Utils.getHardwareId(requireContext())
+                                hwidPref.text = realHwid
+                                hwidPref.summary = realHwid
+                                MmkvManager.encodeSettings(AppConfig.PREF_HWID_VAL, realHwid)
+                            }
 
-                    val osVerPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_OS_VER) as? EditTextPreference
-                    if (osVerPref != null && osVerPref.text.isNullOrEmpty()) {
-                        val defaultVer = android.os.Build.VERSION.RELEASE
-                        osVerPref.text = defaultVer
-                        osVerPref.summary = defaultVer
-                        MmkvManager.encodeSettings(AppConfig.PREF_HWID_OS_VER, defaultVer)
-                    }
+                            val osPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_OS) as? ListPreference
+                            if (osPref != null && osPref.value == null) {
+                                val defaultOS = Utils.getDeviceOS()
+                                osPref.value = defaultOS
+                                osPref.summary = defaultOS
+                                MmkvManager.encodeSettings(AppConfig.PREF_HWID_OS, defaultOS)
+                            }
 
-                    val modelPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_MODEL) as? EditTextPreference
-                    if (modelPref != null && modelPref.text.isNullOrEmpty()) {
-                        val defaultModel = android.os.Build.MODEL
-                        modelPref.text = defaultModel
-                        modelPref.summary = defaultModel
-                        MmkvManager.encodeSettings(AppConfig.PREF_HWID_MODEL, defaultModel)
+                            val osVerPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_OS_VER) as? EditTextPreference
+                            if (osVerPref != null && osVerPref.text.isNullOrEmpty()) {
+                                val defaultVer = android.os.Build.VERSION.RELEASE
+                                osVerPref.text = defaultVer
+                                osVerPref.summary = defaultVer
+                                MmkvManager.encodeSettings(AppConfig.PREF_HWID_OS_VER, defaultVer)
+                            }
+
+                            val modelPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_MODEL) as? EditTextPreference
+                            if (modelPref != null && modelPref.text.isNullOrEmpty()) {
+                                val defaultModel = android.os.Build.MODEL
+                                modelPref.text = defaultModel
+                                modelPref.summary = defaultModel
+                                MmkvManager.encodeSettings(AppConfig.PREF_HWID_MODEL, defaultModel)
+                            }
+                        } catch (e: Exception) {
+                            android.util.Log.e(AppConfig.TAG, "Error initializing HWID fields", e)
+                        }
                     }
                 }
                 true
