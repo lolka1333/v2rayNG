@@ -4,7 +4,11 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
+import android.util.Log
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.handler.NotificationManager
 import com.v2ray.ang.handler.V2RayServiceManager
 import com.v2ray.ang.util.MyContextWrapper
 import java.lang.ref.SoftReference
@@ -26,7 +30,20 @@ class V2RayProxyOnlyService : Service(), ServiceControl {
      * @return The start mode.
      */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        V2RayServiceManager.startCoreLoop(null)
+        try {
+            val guid = MmkvManager.getSelectServer()
+            val config = guid?.let { MmkvManager.decodeServerConfig(it) }
+            NotificationManager.showNotification(config)
+        } catch (e: Exception) {
+            Log.e(AppConfig.TAG, "Failed to show foreground notification", e)
+        }
+
+        val ok = V2RayServiceManager.startCoreLoop(null)
+        if (!ok) {
+            NotificationManager.cancelNotification()
+            stopSelf()
+            return START_NOT_STICKY
+        }
         return START_STICKY
     }
 
