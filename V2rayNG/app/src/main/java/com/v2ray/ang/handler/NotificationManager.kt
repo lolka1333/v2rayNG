@@ -34,7 +34,7 @@ object NotificationManager {
     private var lastQueryTime = 0L
     private var mBuilder: NotificationCompat.Builder? = null
     private var speedNotificationJob: Job? = null
-    private var mNotificationManager: NotificationManager? = null
+    private var mNotificationManager: android.app.NotificationManager? = null
 
     /**
      * Starts the speed notification.
@@ -89,6 +89,10 @@ object NotificationManager {
      */
     fun showNotification(currentConfig: ProfileItem?) {
         val service = getService() ?: return
+        showNotification(service, currentConfig)
+    }
+
+    fun showNotification(service: Service, currentConfig: ProfileItem?) {
         val flags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 
         val startMainIntent = Intent(service, MainActivity::class.java)
@@ -106,7 +110,7 @@ object NotificationManager {
 
         val channelId =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                createNotificationChannel()
+                createNotificationChannel(service)
             } else {
                 // If earlier version channel ID is not used
                 // https://developer.android.com/reference/android/support/v4/app/NotificationCompat.Builder.html#NotificationCompat.Builder(android.content.Context)
@@ -135,6 +139,7 @@ object NotificationManager {
         //mBuilder?.setDefaults(NotificationCompat.FLAG_ONLY_ALERT_ONCE)
 
         service.startForeground(NOTIFICATION_ID, mBuilder?.build())
+        mNotificationManager = service.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
     }
 
     /**
@@ -142,6 +147,10 @@ object NotificationManager {
      */
     fun cancelNotification() {
         val service = getService() ?: return
+        cancelNotification(service)
+    }
+
+    fun cancelNotification(service: Service) {
         service.stopForeground(Service.STOP_FOREGROUND_REMOVE)
 
         mBuilder = null
@@ -167,17 +176,17 @@ object NotificationManager {
      * @return The channel ID.
      */
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun createNotificationChannel(): String {
+    private fun createNotificationChannel(service: Service): String {
         val channelId = AppConfig.RAY_NG_CHANNEL_ID
         val channelName = AppConfig.RAY_NG_CHANNEL_NAME
-        val chan = NotificationChannel(
+        val chan = android.app.NotificationChannel(
             channelId,
-            channelName, NotificationManager.IMPORTANCE_HIGH
+            channelName, android.app.NotificationManager.IMPORTANCE_HIGH
         )
         chan.lightColor = Color.DKGRAY
-        chan.importance = NotificationManager.IMPORTANCE_NONE
+        chan.importance = android.app.NotificationManager.IMPORTANCE_NONE
         chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
-        getNotificationManager()?.createNotificationChannel(chan)
+        (service.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager).createNotificationChannel(chan)
         return channelId
     }
 
@@ -206,10 +215,10 @@ object NotificationManager {
      * Gets the notification manager.
      * @return The notification manager.
      */
-    private fun getNotificationManager(): NotificationManager? {
+    private fun getNotificationManager(): android.app.NotificationManager? {
         if (mNotificationManager == null) {
             val service = getService() ?: return null
-            mNotificationManager = service.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            mNotificationManager = service.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
         }
         return mNotificationManager
     }

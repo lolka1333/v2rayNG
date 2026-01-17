@@ -185,13 +185,13 @@ object V2RayServiceManager {
 
         if (coreController.isRunning == false) {
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, "")
-            NotificationManager.cancelNotification()
+            NotificationManager.cancelNotification(service)
             return false
         }
 
         try {
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
-            NotificationManager.showNotification(currentConfig)
+            NotificationManager.showNotification(service, currentConfig)
             NotificationManager.startSpeedNotification(currentConfig)
 
         } catch (e: Exception) {
@@ -220,7 +220,7 @@ object V2RayServiceManager {
         }
 
         MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_STOP_SUCCESS, "")
-        NotificationManager.cancelNotification()
+        NotificationManager.cancelNotification(service)
 
         try {
             service.unregisterReceiver(mMsgReceive)

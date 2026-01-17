@@ -33,14 +33,14 @@ class V2RayProxyOnlyService : Service(), ServiceControl {
         try {
             val guid = MmkvManager.getSelectServer()
             val config = guid?.let { MmkvManager.decodeServerConfig(it) }
-            NotificationManager.showNotification(config)
+            NotificationManager.showNotification(this, config)
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to show foreground notification", e)
         }
 
         val ok = V2RayServiceManager.startCoreLoop(null)
         if (!ok) {
-            NotificationManager.cancelNotification()
+            NotificationManager.cancelNotification(this)
             stopSelf()
             return START_NOT_STICKY
         }

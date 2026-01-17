@@ -86,14 +86,14 @@ class V2RayVpnService : VpnService(), ServiceControl {
 
     override fun onDestroy() {
         super.onDestroy()
-        NotificationManager.cancelNotification()
+        NotificationManager.cancelNotification(this)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         try {
             val guid = MmkvManager.getSelectServer()
             val config = guid?.let { MmkvManager.decodeServerConfig(it) }
-            NotificationManager.showNotification(config)
+            NotificationManager.showNotification(this, config)
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to show foreground notification", e)
         }
@@ -101,7 +101,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
         if (ok) {
             startService()
         } else {
-            NotificationManager.cancelNotification()
+            NotificationManager.cancelNotification(this)
             stopSelf()
             return START_NOT_STICKY
         }
