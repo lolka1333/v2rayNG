@@ -151,6 +151,12 @@
             android:title="@string/title_pref_hwid_model"
             android:summary="@string/summary_pref_hwid_model" />
 
+        <EditTextPreference
+            android:key="pref_hwid_locale"
+            android:dependency="pref_hwid_enabled"
+            android:title="@string/title_pref_hwid_locale"
+            android:summary="@string/summary_pref_hwid_locale" />
+
         <ListPreference
             android:key="pref_hwid_user_agent_preset"
             android:dependency="pref_hwid_enabled"

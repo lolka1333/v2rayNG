@@ -19,6 +19,7 @@ import com.v2ray.ang.handler.MmkvPreferenceDataStore
 import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.util.Utils
 import java.util.concurrent.TimeUnit
+import java.util.Locale
 import java.util.UUID
 
 class SettingsActivity : BaseActivity() {
@@ -159,6 +160,14 @@ class SettingsActivity : BaseActivity() {
                                 modelPref.text = defaultModel
                                 modelPref.summary = defaultModel
                                 MmkvManager.encodeSettings(AppConfig.PREF_HWID_MODEL, defaultModel)
+                            }
+
+                            val localePref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_LOCALE) as? EditTextPreference
+                            if (localePref != null && localePref.text.isNullOrEmpty()) {
+                                val defaultLocale = Locale.getDefault().language
+                                localePref.text = defaultLocale
+                                localePref.summary = defaultLocale
+                                MmkvManager.encodeSettings(AppConfig.PREF_HWID_LOCALE, defaultLocale)
                             }
 
                             val uaPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_USER_AGENT) as? EditTextPreference

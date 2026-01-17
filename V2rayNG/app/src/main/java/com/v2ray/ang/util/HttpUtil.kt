@@ -16,6 +16,7 @@ import java.net.MalformedURLException
 import java.net.Proxy
 import java.net.URI
 import java.net.URL
+import java.util.Locale
 
 object HttpUtil {
 
@@ -201,6 +202,13 @@ object HttpUtil {
                         val verToSend = if (!customVer.isNullOrEmpty()) customVer else android.os.Build.VERSION.RELEASE
                         conn.setRequestProperty("X-Ver-OS", verToSend)
 
+                        // Custom or Default Locale
+                        val customLocale = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_LOCALE)
+                        val localeToSend = if (!customLocale.isNullOrBlank()) customLocale.trim() else Locale.getDefault().language
+                        if (localeToSend.isNotEmpty()) {
+                            conn.setRequestProperty("X-Device-Locale", localeToSend)
+                        }
+
                         // Custom or Default Model
                         val customModel = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_MODEL)
                         val modelToSend = if (!customModel.isNullOrEmpty()) customModel else Utils.getDeviceModel()
@@ -212,6 +220,7 @@ object HttpUtil {
                         conn.setRequestProperty("X-HWID", realHwid)
                         conn.setRequestProperty("X-Device-OS", Utils.getDeviceOS())
                         conn.setRequestProperty("X-Ver-OS", android.os.Build.VERSION.RELEASE)
+                        conn.setRequestProperty("X-Device-Locale", Locale.getDefault().language)
                         conn.setRequestProperty("X-Device-Model", Utils.getDeviceModel())
                      }
                 }

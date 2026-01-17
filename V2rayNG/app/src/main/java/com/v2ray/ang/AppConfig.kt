@@ -67,6 +67,7 @@ object AppConfig {
     const val PREF_HWID_OS = "pref_hwid_os"
     const val PREF_HWID_OS_VER = "pref_hwid_os_ver"
     const val PREF_HWID_MODEL = "pref_hwid_model"
+    const val PREF_HWID_LOCALE = "pref_hwid_locale"
     const val PREF_HWID_USER_AGENT = "pref_hwid_user_agent"
     const val PREF_HWID_USER_AGENT_PRESET = "pref_hwid_user_agent_preset"
     const val PREF_HWID_USER_AGENT_HAPP_VERSION = "pref_hwid_user_agent_happ_version"

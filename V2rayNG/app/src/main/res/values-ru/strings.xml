@@ -10,6 +10,8 @@
     <string name="summary_pref_hwid_os_ver">Версия ОС (например, 14, 15)</string>
     <string name="title_pref_hwid_model">Кастомная модель (X-Device-Model)</string>
     <string name="summary_pref_hwid_model">Модель устройства (например, Pixel 8)</string>
+    <string name="title_pref_hwid_locale">Кастомная локаль (X-Device-Locale)</string>
+    <string name="summary_pref_hwid_locale">Локаль для заголовка X-Device-Locale (например, ru, en, en-US)</string>
     <string name="title_pref_hwid_user_agent">Кастомный User-Agent</string>
     <string name="summary_pref_hwid_user_agent">Заголовок User-Agent (например, Happ/3.8.1 или v2rayNG/2.0.3)</string>
     <string name="title_pref_hwid_user_agent_preset">Пресет User-Agent</string>
