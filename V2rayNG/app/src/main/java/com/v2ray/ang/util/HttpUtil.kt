@@ -169,6 +169,18 @@ object HttpUtil {
                         )
                         if (ver.isNullOrBlank()) "v2rayNG" else "v2rayNG/${ver.trim()}"
                     }
+                    "flclashx" -> {
+                        val ver = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(
+                            AppConfig.PREF_HWID_USER_AGENT_FLCLASHX_VERSION,
+                            "0.3.0",
+                        )
+                        val v = ver?.trim().orEmpty()
+                        if (v.isEmpty()) {
+                            "FlClash X Platform/android"
+                        } else {
+                            "FlClash X/v${v} Platform/android"
+                        }
+                    }
                     "custom" -> null
                     else -> null
                 }

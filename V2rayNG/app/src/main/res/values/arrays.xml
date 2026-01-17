@@ -219,6 +219,7 @@
         <item>Auto (v2rayNG)</item>
         <item>Happ/&lt;version&gt;</item>
         <item>v2rayNG/&lt;version&gt;</item>
+        <item>FlClash X/v&lt;version&gt;</item>
         <item>Custom</item>
     </string-array>
 
@@ -226,6 +227,7 @@
         <item>auto</item>
         <item>happ</item>
         <item>v2rayng</item>
+        <item>flclashx</item>
         <item>custom</item>
     </string-array>
 

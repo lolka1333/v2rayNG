@@ -19,6 +19,8 @@
     <string name="summary_pref_hwid_user_agent_happ_version">Версия для пресета Happ/&lt;версия&gt; (например, 3.8.1)</string>
     <string name="title_pref_hwid_user_agent_v2rayng_version">Версия v2rayNG</string>
     <string name="summary_pref_hwid_user_agent_v2rayng_version">Версия для пресета v2rayNG/&lt;версия&gt; (по умолчанию версия приложения)</string>
+    <string name="title_pref_hwid_user_agent_flclashx_version">Версия FlClashX</string>
+    <string name="summary_pref_hwid_user_agent_flclashx_version">Версия для пресета FlClash X/v&lt;версия&gt;</string>
     <string name="app_widget_name">v2rayNG</string>
     <string name="app_tile_name">v2rayNG</string>
     <string name="app_tile_first_use">Первое использование этой функции, пожалуйста, используйте приложение, чтобы добавить сервер</string>

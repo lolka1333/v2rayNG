@@ -179,6 +179,13 @@
             android:summary="@string/summary_pref_hwid_user_agent_v2rayng_version" />
 
         <EditTextPreference
+            android:key="pref_hwid_user_agent_flclashx_version"
+            android:dependency="pref_hwid_enabled"
+            android:defaultValue="0.3.0"
+            android:title="@string/title_pref_hwid_user_agent_flclashx_version"
+            android:summary="@string/summary_pref_hwid_user_agent_flclashx_version" />
+
+        <EditTextPreference
             android:key="pref_hwid_user_agent"
             android:dependency="pref_hwid_enabled"
             android:title="@string/title_pref_hwid_user_agent"

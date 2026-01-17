@@ -72,6 +72,7 @@ object AppConfig {
     const val PREF_HWID_USER_AGENT_PRESET = "pref_hwid_user_agent_preset"
     const val PREF_HWID_USER_AGENT_HAPP_VERSION = "pref_hwid_user_agent_happ_version"
     const val PREF_HWID_USER_AGENT_V2RAYNG_VERSION = "pref_hwid_user_agent_v2rayng_version"
+    const val PREF_HWID_USER_AGENT_FLCLASHX_VERSION = "pref_hwid_user_agent_flclashx_version"
     const val PREF_IS_BOOTED = "pref_is_booted"
     const val PREF_CHECK_UPDATE_PRE_RELEASE = "pref_check_update_pre_release"
     const val PREF_GEO_FILES_SOURCES = "pref_geo_files_sources"
