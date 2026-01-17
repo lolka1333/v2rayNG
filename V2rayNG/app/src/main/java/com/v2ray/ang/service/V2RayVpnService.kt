@@ -73,6 +73,11 @@ class V2RayVpnService : VpnService(), ServiceControl {
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
         V2RayServiceManager.serviceControl = SoftReference(this)
+        try {
+            NotificationManager.showNotification(this, null)
+        } catch (e: Exception) {
+            Log.e(AppConfig.TAG, "Failed to show foreground notification in onCreate", e)
+        }
     }
 
     override fun onRevoke() {

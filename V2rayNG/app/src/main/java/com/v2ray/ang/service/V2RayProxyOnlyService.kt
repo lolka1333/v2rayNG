@@ -20,6 +20,11 @@ class V2RayProxyOnlyService : Service(), ServiceControl {
     override fun onCreate() {
         super.onCreate()
         V2RayServiceManager.serviceControl = SoftReference(this)
+        try {
+            NotificationManager.showNotification(this, null)
+        } catch (e: Exception) {
+            Log.e(AppConfig.TAG, "Failed to show foreground notification in onCreate", e)
+        }
     }
 
     /**
@@ -53,6 +58,7 @@ class V2RayProxyOnlyService : Service(), ServiceControl {
     override fun onDestroy() {
         super.onDestroy()
         V2RayServiceManager.stopCoreLoop()
+        NotificationManager.cancelNotification(this)
     }
 
     /**
