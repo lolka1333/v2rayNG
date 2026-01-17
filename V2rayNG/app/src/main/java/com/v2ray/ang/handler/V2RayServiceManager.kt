@@ -130,12 +130,15 @@ object V2RayServiceManager {
         } catch (e: SecurityException) {
             Log.e(AppConfig.TAG, "Failed to start foreground service (SecurityException)", e)
             context.toast(R.string.toast_services_failure)
+            MessageUtil.sendMsg2UI(context, AppConfig.MSG_STATE_START_FAILURE, "")
         } catch (e: IllegalStateException) {
             Log.e(AppConfig.TAG, "Failed to start foreground service (IllegalStateException)", e)
             context.toast(R.string.toast_services_failure)
+            MessageUtil.sendMsg2UI(context, AppConfig.MSG_STATE_START_FAILURE, "")
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to start foreground service", e)
             context.toast(R.string.toast_services_failure)
+            MessageUtil.sendMsg2UI(context, AppConfig.MSG_STATE_START_FAILURE, "")
         }
     }
 
