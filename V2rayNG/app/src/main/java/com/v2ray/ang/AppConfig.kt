@@ -64,6 +64,9 @@ object AppConfig {
     const val PREF_MODE = "pref_mode" // Keep only one definition
     const val PREF_HWID_ENABLED = "pref_hwid_enabled"
     const val PREF_HWID_VAL = "pref_hwid_val"
+    const val PREF_HWID_OS = "pref_hwid_os"
+    const val PREF_HWID_OS_VER = "pref_hwid_os_ver"
+    const val PREF_HWID_MODEL = "pref_hwid_model"
     const val PREF_IS_BOOTED = "pref_is_booted"
     const val PREF_CHECK_UPDATE_PRE_RELEASE = "pref_check_update_pre_release"
     const val PREF_GEO_FILES_SOURCES = "pref_geo_files_sources"

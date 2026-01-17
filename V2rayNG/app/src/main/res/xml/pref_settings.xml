@@ -129,6 +129,27 @@
             android:dependency="pref_hwid_enabled"
             android:title="@string/title_pref_hwid_val"
             android:summary="@string/summary_pref_hwid_val" />
+
+        <ListPreference
+            android:key="pref_hwid_os"
+            android:dependency="pref_hwid_enabled"
+            android:title="@string/title_pref_hwid_os"
+            android:summary="%s"
+            android:entries="@array/hwid_os_entries"
+            android:entryValues="@array/hwid_os_values"
+            android:defaultValue="android" />
+
+        <EditTextPreference
+            android:key="pref_hwid_os_ver"
+            android:dependency="pref_hwid_enabled"
+            android:title="@string/title_pref_hwid_os_ver"
+            android:summary="@string/summary_pref_hwid_os_ver" />
+
+        <EditTextPreference
+            android:key="pref_hwid_model"
+            android:dependency="pref_hwid_enabled"
+            android:title="@string/title_pref_hwid_model"
+            android:summary="@string/summary_pref_hwid_model" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_core_settings">

@@ -405,6 +405,34 @@ object Utils {
     }
 
     /**
+     * Get the device OS name (e.g. android).
+     */
+    fun getDeviceOS(): String {
+        return try {
+             // System.getProperty("os.name") usually returns "Linux" on Android
+             // We normalize 'linux' to 'android' for Remnawave compatibility, 
+             // but keep other values if they miraculously appear (e.g. Chrome OS container might differ).
+             val os = System.getProperty("os.name")?.lowercase() ?: "android"
+             if (os.contains("linux") || os.contains("android")) "android" else os
+        } catch (e: Exception) {
+            "android"
+        }
+    }
+
+    /**
+     * Get the device Model (e.g. Pixel 6).
+     */
+    fun getDeviceModel(): String {
+        return try {
+             var model = Build.MODEL
+             if (model.isNullOrEmpty()) model = "Unknown"
+             model
+        } catch (e: Exception) {
+            "Unknown"
+        }
+    }
+
+    /**
      * Get the dark mode status.
      *
      * @param context The context to use.

@@ -109,6 +109,30 @@ class SettingsActivity : BaseActivity() {
                         hwidPref?.summary = realHwid
                         MmkvManager.encodeSettings(AppConfig.PREF_HWID_VAL, realHwid)
                     }
+                    
+                    val osPref = findPreference<ListPreference>(AppConfig.PREF_HWID_OS)
+                    if (osPref?.value == null) {
+                        val defaultOS = Utils.getDeviceOS() // Uses System property now
+                        osPref?.value = defaultOS
+                        osPref?.summary = defaultOS
+                        MmkvManager.encodeSettings(AppConfig.PREF_HWID_OS, defaultOS)
+                    }
+
+                    val osVerPref = findPreference<EditTextPreference>(AppConfig.PREF_HWID_OS_VER)
+                    if (osVerPref?.text.isNullOrEmpty()) {
+                        val defaultVer = android.os.Build.VERSION.RELEASE
+                        osVerPref?.text = defaultVer
+                        osVerPref?.summary = defaultVer
+                        MmkvManager.encodeSettings(AppConfig.PREF_HWID_OS_VER, defaultVer)
+                    }
+
+                    val modelPref = findPreference<EditTextPreference>(AppConfig.PREF_HWID_MODEL)
+                    if (modelPref?.text.isNullOrEmpty()) {
+                        val defaultModel = android.os.Build.MODEL
+                        modelPref?.text = defaultModel
+                        modelPref?.summary = defaultModel
+                        MmkvManager.encodeSettings(AppConfig.PREF_HWID_MODEL, defaultModel)
+                    }
                 }
                 true
             }

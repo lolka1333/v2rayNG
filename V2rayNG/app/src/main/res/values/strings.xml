@@ -2,8 +2,14 @@
 <resources>
     <string name="title_pref_hwid_enabled">Enable Custom HWID</string>
     <string name="summary_pref_hwid_enabled">Override device hardware ID for subscriptions</string>
-    <string name="title_pref_hwid_val">Custom HWID</string>
+    <string name="title_pref_hwid_val">Custom HWID (X-HWID)</string>
     <string name="summary_pref_hwid_val">Device ID sent in X-HWID header</string>
+    <string name="title_pref_hwid_os">Custom OS (X-Device-OS)</string>
+    <string name="summary_pref_hwid_os">Operating System (e.g. android)</string>
+    <string name="title_pref_hwid_os_ver">Custom OS Version (X-Ver-OS)</string>
+    <string name="summary_pref_hwid_os_ver">OS Version (e.g. 14, 15)</string>
+    <string name="title_pref_hwid_model">Custom Model (X-Device-Model)</string>
+    <string name="summary_pref_hwid_model">Device Model (e.g. Pixel 8)</string>
     <string name="app_name" translatable="false">v2rayNG</string>
     <string name="app_widget_name">Switch</string>
     <string name="app_tile_name">Switch</string>
@@ -428,6 +434,22 @@
     <string-array name="config_backup_options">
         <item>Local</item>
         <item>WebDAV</item>
+    </string-array>
+
+    <string-array name="hwid_os_entries">
+        <item>Android</item>
+        <item>iOS</item>
+        <item>Windows</item>
+        <item>macOS</item>
+        <item>Linux</item>
+    </string-array>
+
+    <string-array name="hwid_os_values">
+        <item>android</item>
+        <item>ios</item>
+        <item>windows</item>
+        <item>macos</item>
+        <item>linux</item>
     </string-array>
 
 </resources>
