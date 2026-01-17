@@ -125,7 +125,18 @@ object V2RayServiceManager {
         } else {
             Intent(context.applicationContext, V2RayProxyOnlyService::class.java)
         }
-        ContextCompat.startForegroundService(context, intent)
+        try {
+            ContextCompat.startForegroundService(context, intent)
+        } catch (e: SecurityException) {
+            Log.e(AppConfig.TAG, "Failed to start foreground service (SecurityException)", e)
+            context.toast(R.string.toast_services_failure)
+        } catch (e: IllegalStateException) {
+            Log.e(AppConfig.TAG, "Failed to start foreground service (IllegalStateException)", e)
+            context.toast(R.string.toast_services_failure)
+        } catch (e: Exception) {
+            Log.e(AppConfig.TAG, "Failed to start foreground service", e)
+            context.toast(R.string.toast_services_failure)
+        }
     }
 
     /**

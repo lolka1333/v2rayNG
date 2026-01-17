@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="title_pref_hwid_enabled">Включить кастомный HWID</string>
+    <string name="summary_pref_hwid_enabled">Переопределять HWID устройства для подписок</string>
+    <string name="title_pref_hwid_val">Кастомный HWID (X-HWID)</string>
+    <string name="summary_pref_hwid_val">ID устройства, который отправляется в заголовке X-HWID</string>
+    <string name="title_pref_hwid_os">Кастомная ОС (X-Device-OS)</string>
+    <string name="summary_pref_hwid_os">Операционная система (например, android)</string>
+    <string name="title_pref_hwid_os_ver">Версия ОС (X-Ver-OS)</string>
+    <string name="summary_pref_hwid_os_ver">Версия ОС (например, 14, 15)</string>
+    <string name="title_pref_hwid_model">Кастомная модель (X-Device-Model)</string>
+    <string name="summary_pref_hwid_model">Модель устройства (например, Pixel 8)</string>
     <string name="app_widget_name">v2rayNG</string>
     <string name="app_tile_name">v2rayNG</string>
     <string name="app_tile_first_use">Первое использование этой функции, пожалуйста, используйте приложение, чтобы добавить сервер</string>
