@@ -119,10 +119,16 @@
             android:summary="300,60"
             android:title="@string/title_pref_hev_tunnel_rw_timeout" />
 
+        <CheckBoxPreference
+            android:key="pref_hwid_enabled"
+            android:title="@string/title_pref_hwid_enabled"
+            android:summary="@string/summary_pref_hwid_enabled" />
+
         <EditTextPreference
-            android:key="pref_fake_hwid"
-            android:title="@string/title_pref_fake_hwid"
-            android:summary="@string/summary_pref_fake_hwid" />
+            android:key="pref_hwid_val"
+            android:dependency="pref_hwid_enabled"
+            android:title="@string/title_pref_hwid_val"
+            android:summary="@string/summary_pref_hwid_val" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_core_settings">

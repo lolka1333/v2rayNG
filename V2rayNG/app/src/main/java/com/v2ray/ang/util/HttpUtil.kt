@@ -145,10 +145,18 @@ object HttpUtil {
 
             // Inject HWID headers for Remnawave
             try {
-                val fakeHwid = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_FAKE_HWID)
-                val hwid = if (!fakeHwid.isNullOrEmpty()) fakeHwid else Utils.getHardwareId(com.v2ray.ang.AngApplication.application)
-                if (hwid.isNotEmpty()) {
-                    conn.setRequestProperty("X-HWID", hwid)
+                val isBypassEnabled = com.v2ray.ang.handler.MmkvManager.decodeSettingsBool(AppConfig.PREF_HWID_ENABLED, false)
+                val realHwid = Utils.getHardwareId(com.v2ray.ang.AngApplication.application)
+
+                val hwidToSend = if (isBypassEnabled) {
+                    val customHwid = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_VAL)
+                    if (!customHwid.isNullOrEmpty()) customHwid else realHwid
+                } else {
+                    realHwid
+                }
+                
+                if (hwidToSend.isNotEmpty()) {
+                    conn.setRequestProperty("X-HWID", hwidToSend)
                     conn.setRequestProperty("X-Device-OS", "android")
                     conn.setRequestProperty("X-Ver-OS", android.os.Build.VERSION.RELEASE)
                     conn.setRequestProperty("X-Device-Model", android.os.Build.MODEL)

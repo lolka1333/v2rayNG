@@ -99,6 +99,20 @@ class SettingsActivity : BaseActivity() {
             }
             mode?.dialogLayoutResource = R.layout.preference_with_help_link
 
+            findPreference<CheckBoxPreference>(AppConfig.PREF_HWID_ENABLED)?.setOnPreferenceChangeListener { _, newValue ->
+                val enabled = newValue as Boolean
+                if (enabled) {
+                    val hwidPref = findPreference<EditTextPreference>(AppConfig.PREF_HWID_VAL)
+                    if (hwidPref?.text.isNullOrEmpty()) {
+                        val realHwid = Utils.getHardwareId(requireContext())
+                        hwidPref?.text = realHwid
+                        hwidPref?.summary = realHwid
+                        MmkvManager.encodeSettings(AppConfig.PREF_HWID_VAL, realHwid)
+                    }
+                }
+                true
+            }
+
         }
 
         private fun initPreferenceSummaries() {
