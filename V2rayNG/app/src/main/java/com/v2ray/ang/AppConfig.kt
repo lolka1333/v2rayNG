@@ -61,8 +61,7 @@ object AppConfig {
     const val PREF_IP_API_URL = "pref_ip_api_url"
     const val PREF_LOGLEVEL = "pref_core_loglevel"
     const val PREF_OUTBOUND_DOMAIN_RESOLVE_METHOD = "pref_outbound_domain_resolve_method"
-    const val PREF_MODE = "pref_mode"
-    const val PREF_MODE = "pref_mode"
+    const val PREF_MODE = "pref_mode" // Keep only one definition
     const val PREF_HWID_ENABLED = "pref_hwid_enabled"
     const val PREF_HWID_VAL = "pref_hwid_val"
     const val PREF_IS_BOOTED = "pref_is_booted"
