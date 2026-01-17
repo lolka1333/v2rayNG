@@ -19,6 +19,7 @@ import com.v2ray.ang.handler.MmkvPreferenceDataStore
 import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.util.Utils
 import java.util.concurrent.TimeUnit
+import java.util.UUID
 
 class SettingsActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -107,10 +108,10 @@ class SettingsActivity : BaseActivity() {
                         try {
                             val hwidPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_VAL) as? EditTextPreference
                             if (hwidPref != null && hwidPref.text.isNullOrEmpty()) {
-                                val realHwid = Utils.getHardwareId(requireContext())
-                                hwidPref.text = realHwid
-                                hwidPref.summary = realHwid
-                                MmkvManager.encodeSettings(AppConfig.PREF_HWID_VAL, realHwid)
+                                val generatedHwid = UUID.randomUUID().toString().replace("-", "")
+                                hwidPref.text = generatedHwid
+                                hwidPref.summary = generatedHwid
+                                MmkvManager.encodeSettings(AppConfig.PREF_HWID_VAL, generatedHwid)
                             }
 
                             val osPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_OS) as? ListPreference
