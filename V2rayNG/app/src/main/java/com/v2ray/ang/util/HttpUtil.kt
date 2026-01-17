@@ -136,17 +136,54 @@ object HttpUtil {
         while (redirects++ < maxRedirects) {
             if (currentUrl == null) continue
             val conn = createProxyConnection(currentUrl, httpPort, timeout, timeout) ?: continue
-            val finalUserAgent = if (userAgent.isNullOrBlank()) {
-                "v2rayNG/${BuildConfig.VERSION_NAME}"
+            // User-Agent priority:
+            // 1) subscription-level userAgent (SubEditActivity)
+            // 2) HWID feature preset UA (pref_hwid_user_agent_preset) when HWID feature is enabled
+            // 3) default v2rayNG/<version>
+            val isBypassEnabled = com.v2ray.ang.handler.MmkvManager.decodeSettingsBool(AppConfig.PREF_HWID_ENABLED, false)
+            val hwidUserAgentPreset = if (isBypassEnabled) {
+                com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_USER_AGENT_PRESET, "auto")
             } else {
-                userAgent
+                "auto"
+            }
+            val hwidCustomUserAgent = if (isBypassEnabled && hwidUserAgentPreset == "custom") {
+                com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_USER_AGENT)
+            } else {
+                null
+            }
+            val hwidPresetUserAgent = if (isBypassEnabled) {
+                when (hwidUserAgentPreset) {
+                    "happ_3_8_1" -> "Happ/3.8.1" // backward compatibility
+                    "happ" -> {
+                        val ver = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(
+                            AppConfig.PREF_HWID_USER_AGENT_HAPP_VERSION,
+                            "3.8.1",
+                        )
+                        if (ver.isNullOrBlank()) "Happ" else "Happ/${ver.trim()}"
+                    }
+                    "v2rayng" -> {
+                        val ver = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(
+                            AppConfig.PREF_HWID_USER_AGENT_V2RAYNG_VERSION,
+                            BuildConfig.VERSION_NAME,
+                        )
+                        if (ver.isNullOrBlank()) "v2rayNG" else "v2rayNG/${ver.trim()}"
+                    }
+                    "custom" -> null
+                    else -> null
+                }
+            } else {
+                null
+            }
+            val finalUserAgent = when {
+                !userAgent.isNullOrBlank() -> userAgent
+                !hwidPresetUserAgent.isNullOrBlank() -> hwidPresetUserAgent
+                !hwidCustomUserAgent.isNullOrBlank() -> hwidCustomUserAgent
+                else -> "v2rayNG/${BuildConfig.VERSION_NAME}"
             }
             conn.setRequestProperty("User-agent", finalUserAgent)
 
             // Inject HWID headers for Remnawave
             try {
-                val isBypassEnabled = com.v2ray.ang.handler.MmkvManager.decodeSettingsBool(AppConfig.PREF_HWID_ENABLED, false)
-
                 if (isBypassEnabled) {
                     val customHwid = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_VAL)
                     val hwidToSend = customHwid.orEmpty()

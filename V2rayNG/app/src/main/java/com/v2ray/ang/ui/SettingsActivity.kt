@@ -100,6 +100,29 @@ class SettingsActivity : BaseActivity() {
             }
             mode?.dialogLayoutResource = R.layout.preference_with_help_link
 
+            val hwidUaPresetPref = findPreference<ListPreference>(AppConfig.PREF_HWID_USER_AGENT_PRESET)
+            val hwidUaPref = findPreference<EditTextPreference>(AppConfig.PREF_HWID_USER_AGENT)
+            val hwidUaHappVerPref = findPreference<EditTextPreference>(AppConfig.PREF_HWID_USER_AGENT_HAPP_VERSION)
+            val hwidUaV2rayngVerPref = findPreference<EditTextPreference>(AppConfig.PREF_HWID_USER_AGENT_V2RAYNG_VERSION)
+            fun syncHwidUaUiState() {
+                val enabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_HWID_ENABLED, false)
+                val preset = hwidUaPresetPref?.value ?: MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_USER_AGENT_PRESET, "auto")
+                hwidUaPref?.isEnabled = enabled && preset == "custom"
+                hwidUaHappVerPref?.isEnabled = enabled && preset == "happ"
+                hwidUaV2rayngVerPref?.isEnabled = enabled && preset == "v2rayng"
+            }
+
+            hwidUaPresetPref?.setOnPreferenceChangeListener { _, newValue ->
+                // ListPreference summary will be updated by initPreferenceSummaries
+                val enabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_HWID_ENABLED, false)
+                val preset = newValue?.toString().orEmpty()
+                hwidUaPref?.isEnabled = enabled && preset == "custom"
+                hwidUaHappVerPref?.isEnabled = enabled && preset == "happ"
+                hwidUaV2rayngVerPref?.isEnabled = enabled && preset == "v2rayng"
+                true
+            }
+            syncHwidUaUiState()
+
             findPreference<CheckBoxPreference>(AppConfig.PREF_HWID_ENABLED)?.setOnPreferenceChangeListener { _, newValue ->
                 val enabled = newValue as Boolean
                 if (enabled) {
@@ -137,10 +160,46 @@ class SettingsActivity : BaseActivity() {
                                 modelPref.summary = defaultModel
                                 MmkvManager.encodeSettings(AppConfig.PREF_HWID_MODEL, defaultModel)
                             }
+
+                            val uaPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_USER_AGENT) as? EditTextPreference
+                            if (uaPref != null && uaPref.text.isNullOrEmpty()) {
+                                val defaultUa = "v2rayNG/${com.v2ray.ang.BuildConfig.VERSION_NAME}"
+                                uaPref.text = defaultUa
+                                uaPref.summary = defaultUa
+                                MmkvManager.encodeSettings(AppConfig.PREF_HWID_USER_AGENT, defaultUa)
+                            }
+
+                            val uaPresetPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_USER_AGENT_PRESET) as? ListPreference
+                            if (uaPresetPref != null && uaPresetPref.value == null) {
+                                uaPresetPref.value = "auto"
+                                uaPresetPref.summary = uaPresetPref.entry ?: "auto"
+                                MmkvManager.encodeSettings(AppConfig.PREF_HWID_USER_AGENT_PRESET, "auto")
+                            }
+
+                            val happVerPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_USER_AGENT_HAPP_VERSION) as? EditTextPreference
+                            if (happVerPref != null && happVerPref.text.isNullOrEmpty()) {
+                                val defaultHappVer = "3.8.1"
+                                happVerPref.text = defaultHappVer
+                                happVerPref.summary = defaultHappVer
+                                MmkvManager.encodeSettings(AppConfig.PREF_HWID_USER_AGENT_HAPP_VERSION, defaultHappVer)
+                            }
+
+                            val v2rayngVerPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_USER_AGENT_V2RAYNG_VERSION) as? EditTextPreference
+                            if (v2rayngVerPref != null && v2rayngVerPref.text.isNullOrEmpty()) {
+                                val defaultV2rayngVer = com.v2ray.ang.BuildConfig.VERSION_NAME
+                                v2rayngVerPref.text = defaultV2rayngVer
+                                v2rayngVerPref.summary = defaultV2rayngVer
+                                MmkvManager.encodeSettings(AppConfig.PREF_HWID_USER_AGENT_V2RAYNG_VERSION, defaultV2rayngVer)
+                            }
+
+                            syncHwidUaUiState()
                         } catch (e: Exception) {
                             android.util.Log.e(AppConfig.TAG, "Error initializing HWID fields", e)
                         }
                     }
+                }
+                if (!enabled) {
+                    syncHwidUaUiState()
                 }
                 true
             }
@@ -189,6 +248,13 @@ class SettingsActivity : BaseActivity() {
             super.onStart()
             // Initialize mode-dependent UI states
             updateMode(MmkvManager.decodeSettingsString(AppConfig.PREF_MODE, VPN))
+
+            // Initialize HWID user-agent UI state
+            val hwidUaPresetPref = findPreference<ListPreference>(AppConfig.PREF_HWID_USER_AGENT_PRESET)
+            val hwidUaPref = findPreference<EditTextPreference>(AppConfig.PREF_HWID_USER_AGENT)
+            val hwidEnabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_HWID_ENABLED, false)
+            val preset = hwidUaPresetPref?.value ?: MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_USER_AGENT_PRESET, "auto")
+            hwidUaPref?.isEnabled = hwidEnabled && preset == "custom"
 
             // Initialize mux-dependent UI states
             updateMux(MmkvManager.decodeSettingsBool(AppConfig.PREF_MUX_ENABLED, false))

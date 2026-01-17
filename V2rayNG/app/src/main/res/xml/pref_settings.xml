@@ -150,6 +150,33 @@
             android:dependency="pref_hwid_enabled"
             android:title="@string/title_pref_hwid_model"
             android:summary="@string/summary_pref_hwid_model" />
+
+        <ListPreference
+            android:key="pref_hwid_user_agent_preset"
+            android:dependency="pref_hwid_enabled"
+            android:title="@string/title_pref_hwid_user_agent_preset"
+            android:summary="%s"
+            android:entries="@array/hwid_user_agent_preset_entries"
+            android:entryValues="@array/hwid_user_agent_preset_values"
+            android:defaultValue="auto" />
+
+        <EditTextPreference
+            android:key="pref_hwid_user_agent_happ_version"
+            android:dependency="pref_hwid_enabled"
+            android:title="@string/title_pref_hwid_user_agent_happ_version"
+            android:summary="@string/summary_pref_hwid_user_agent_happ_version" />
+
+        <EditTextPreference
+            android:key="pref_hwid_user_agent_v2rayng_version"
+            android:dependency="pref_hwid_enabled"
+            android:title="@string/title_pref_hwid_user_agent_v2rayng_version"
+            android:summary="@string/summary_pref_hwid_user_agent_v2rayng_version" />
+
+        <EditTextPreference
+            android:key="pref_hwid_user_agent"
+            android:dependency="pref_hwid_enabled"
+            android:title="@string/title_pref_hwid_user_agent"
+            android:summary="@string/summary_pref_hwid_user_agent" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/title_core_settings">

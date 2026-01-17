@@ -215,6 +215,20 @@
         <item>2</item>
     </string-array>
 
+    <string-array name="hwid_user_agent_preset_entries">
+        <item>Auto (v2rayNG)</item>
+        <item>Happ/&lt;version&gt;</item>
+        <item>v2rayNG/&lt;version&gt;</item>
+        <item>Custom</item>
+    </string-array>
+
+    <string-array name="hwid_user_agent_preset_values" translatable="false">
+        <item>auto</item>
+        <item>happ</item>
+        <item>v2rayng</item>
+        <item>custom</item>
+    </string-array>
+
     <string-array name="ech_force_query_value" translatable="false">
         <item />
         <item>none</item>
