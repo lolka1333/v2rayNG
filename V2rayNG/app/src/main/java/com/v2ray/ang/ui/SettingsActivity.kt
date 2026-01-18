@@ -119,6 +119,8 @@ class SettingsActivity : BaseActivity() {
                 // ListPreference summary will be updated by initPreferenceSummaries
                 val enabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_HWID_ENABLED, false)
                 val preset = newValue?.toString().orEmpty()
+                val idx = hwidUaPresetPref.findIndexOfValue(preset)
+                hwidUaPresetPref.summary = (if (idx >= 0) hwidUaPresetPref.entries[idx] else preset) as CharSequence?
                 hwidUaPref?.isEnabled = enabled && preset == "custom"
                 hwidUaHappVerPref?.isEnabled = enabled && preset == "happ"
                 hwidUaV2rayngVerPref?.isEnabled = enabled && preset == "v2rayng"
