@@ -15,6 +15,7 @@
     <string name="title_pref_hwid_user_agent">Кастомный User-Agent</string>
     <string name="summary_pref_hwid_user_agent">Заголовок User-Agent (например, Happ/3.8.1 или v2rayNG/2.0.3)</string>
     <string name="title_pref_hwid_user_agent_preset">Пресет User-Agent</string>
+    <string name="title_pref_hwid_v2raytun_platform">Платформа v2raytun</string>
     <string name="title_pref_hwid_user_agent_happ_version">Версия Happ</string>
     <string name="summary_pref_hwid_user_agent_happ_version">Версия для пресета Happ/&lt;версия&gt; (например, 3.8.1)</string>
     <string name="title_pref_hwid_user_agent_v2rayng_version">Версия v2rayNG</string>

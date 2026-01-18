@@ -169,8 +169,15 @@ object HttpUtil {
                         )
                         if (ver.isNullOrBlank()) "v2rayNG" else "v2rayNG/${ver.trim()}"
                     }
-                    "v2raytun" -> "v2raytun/android"
-                    "v2raytun_ios" -> "v2raytun/ios"
+                    "v2raytun" -> {
+                        val platform = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(
+                            AppConfig.PREF_HWID_V2RAYTUN_PLATFORM,
+                            "android",
+                        )
+                        val p = platform?.trim().orEmpty().ifEmpty { "android" }
+                        "v2raytun/${p}"
+                    }
+                    "v2raytun_ios" -> "v2raytun/ios" // backward compatibility
                     "flclashx" -> {
                         val ver = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(
                             AppConfig.PREF_HWID_USER_AGENT_FLCLASHX_VERSION,

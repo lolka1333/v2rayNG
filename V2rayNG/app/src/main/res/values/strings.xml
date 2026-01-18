@@ -15,6 +15,7 @@
     <string name="title_pref_hwid_user_agent">Custom User-Agent</string>
     <string name="summary_pref_hwid_user_agent">User-Agent header (e.g. Happ/3.8.1 or v2rayNG/2.0.3)</string>
     <string name="title_pref_hwid_user_agent_preset">User-Agent preset</string>
+    <string name="title_pref_hwid_v2raytun_platform">v2raytun platform</string>
     <string name="title_pref_hwid_user_agent_happ_version">Happ version</string>
     <string name="summary_pref_hwid_user_agent_happ_version">Version part for Happ/&lt;version&gt; preset (e.g. 3.8.1)</string>
     <string name="title_pref_hwid_user_agent_v2rayng_version">v2rayNG version</string>

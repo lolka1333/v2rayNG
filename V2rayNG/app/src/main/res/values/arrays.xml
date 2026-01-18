@@ -217,11 +217,10 @@
 
     <string-array name="hwid_user_agent_preset_entries">
         <item>Auto (v2rayNG)</item>
-        <item>Happ/&lt;version&gt;</item>
-        <item>v2rayNG/&lt;version&gt;</item>
-        <item>v2raytun/android</item>
-        <item>v2raytun/ios</item>
-        <item>FlClash X/v&lt;version&gt;</item>
+        <item>Happ</item>
+        <item>v2rayNG</item>
+        <item>v2raytun</item>
+        <item>FlClash X</item>
         <item>Custom</item>
     </string-array>
 
@@ -230,9 +229,18 @@
         <item>happ</item>
         <item>v2rayng</item>
         <item>v2raytun</item>
-        <item>v2raytun_ios</item>
         <item>flclashx</item>
         <item>custom</item>
+    </string-array>
+
+    <string-array name="hwid_v2raytun_platform_entries">
+        <item>android</item>
+        <item>ios</item>
+    </string-array>
+
+    <string-array name="hwid_v2raytun_platform_values" translatable="false">
+        <item>android</item>
+        <item>ios</item>
     </string-array>
 
     <string-array name="ech_force_query_value" translatable="false">

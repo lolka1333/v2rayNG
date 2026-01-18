@@ -166,6 +166,15 @@
             android:entryValues="@array/hwid_user_agent_preset_values"
             android:defaultValue="auto" />
 
+        <ListPreference
+            android:key="pref_hwid_v2raytun_platform"
+            android:dependency="pref_hwid_enabled"
+            android:title="@string/title_pref_hwid_v2raytun_platform"
+            android:summary="%s"
+            android:entries="@array/hwid_v2raytun_platform_entries"
+            android:entryValues="@array/hwid_v2raytun_platform_values"
+            android:defaultValue="android" />
+
         <EditTextPreference
             android:key="pref_hwid_user_agent_happ_version"
             android:dependency="pref_hwid_enabled"
