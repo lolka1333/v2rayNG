@@ -103,21 +103,18 @@ class SettingsActivity : BaseActivity() {
 
             val hwidUaPresetPref = findPreference<ListPreference>(AppConfig.PREF_HWID_USER_AGENT_PRESET)
             val hwidV2raytunPlatformPref = findPreference<ListPreference>(AppConfig.PREF_HWID_V2RAYTUN_PLATFORM)
+            val hwidFlclashxPlatformPref = findPreference<ListPreference>(AppConfig.PREF_HWID_FLCLASHX_PLATFORM)
             val hwidUaPref = findPreference<EditTextPreference>(AppConfig.PREF_HWID_USER_AGENT)
             val hwidUaHappVerPref = findPreference<EditTextPreference>(AppConfig.PREF_HWID_USER_AGENT_HAPP_VERSION)
             val hwidUaV2rayngVerPref = findPreference<EditTextPreference>(AppConfig.PREF_HWID_USER_AGENT_V2RAYNG_VERSION)
             val hwidUaFlclashxVerPref = findPreference<EditTextPreference>(AppConfig.PREF_HWID_USER_AGENT_FLCLASHX_VERSION)
-
-            val storedUaPreset = MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_USER_AGENT_PRESET, "auto")
-            if (storedUaPreset == "v2raytun_ios") {
-                MmkvManager.encodeSettings(AppConfig.PREF_HWID_USER_AGENT_PRESET, "v2raytun")
-                MmkvManager.encodeSettings(AppConfig.PREF_HWID_V2RAYTUN_PLATFORM, "ios")
-                hwidUaPresetPref?.value = "v2raytun"
-                hwidV2raytunPlatformPref?.value = "ios"
-            }
             if (MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_V2RAYTUN_PLATFORM, null).isNullOrBlank()) {
                 MmkvManager.encodeSettings(AppConfig.PREF_HWID_V2RAYTUN_PLATFORM, "android")
                 hwidV2raytunPlatformPref?.value = "android"
+            }
+            if (MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_FLCLASHX_PLATFORM, null).isNullOrBlank()) {
+                MmkvManager.encodeSettings(AppConfig.PREF_HWID_FLCLASHX_PLATFORM, "android")
+                hwidFlclashxPlatformPref?.value = "android"
             }
 
             fun syncHwidUaUiState() {
@@ -128,9 +125,13 @@ class SettingsActivity : BaseActivity() {
                 val showV2rayngVer = enabled && preset == "v2rayng"
                 val showFlclashxVer = enabled && preset == "flclashx"
                 val showV2raytunPlatform = enabled && preset == "v2raytun"
+                val showFlclashxPlatform = enabled && preset == "flclashx"
 
                 hwidV2raytunPlatformPref?.isVisible = showV2raytunPlatform
                 hwidV2raytunPlatformPref?.isEnabled = showV2raytunPlatform
+
+                hwidFlclashxPlatformPref?.isVisible = showFlclashxPlatform
+                hwidFlclashxPlatformPref?.isEnabled = showFlclashxPlatform
 
                 hwidUaPref?.isVisible = showCustomUa
                 hwidUaPref?.isEnabled = showCustomUa
@@ -156,9 +157,13 @@ class SettingsActivity : BaseActivity() {
                 val showV2rayngVer = enabled && preset == "v2rayng"
                 val showFlclashxVer = enabled && preset == "flclashx"
                 val showV2raytunPlatform = enabled && preset == "v2raytun"
+                val showFlclashxPlatform = enabled && preset == "flclashx"
 
                 hwidV2raytunPlatformPref?.isVisible = showV2raytunPlatform
                 hwidV2raytunPlatformPref?.isEnabled = showV2raytunPlatform
+
+                hwidFlclashxPlatformPref?.isVisible = showFlclashxPlatform
+                hwidFlclashxPlatformPref?.isEnabled = showFlclashxPlatform
 
                 hwidUaPref?.isVisible = showCustomUa
                 hwidUaPref?.isEnabled = showCustomUa
@@ -241,6 +246,13 @@ class SettingsActivity : BaseActivity() {
                                 v2raytunPlatformPref.value = "android"
                                 v2raytunPlatformPref.summary = v2raytunPlatformPref.entry ?: "android"
                                 MmkvManager.encodeSettings(AppConfig.PREF_HWID_V2RAYTUN_PLATFORM, "android")
+                            }
+
+                            val flclashxPlatformPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_FLCLASHX_PLATFORM) as? ListPreference
+                            if (flclashxPlatformPref != null && flclashxPlatformPref.value == null) {
+                                flclashxPlatformPref.value = "android"
+                                flclashxPlatformPref.summary = flclashxPlatformPref.entry ?: "android"
+                                MmkvManager.encodeSettings(AppConfig.PREF_HWID_FLCLASHX_PLATFORM, "android")
                             }
 
                             val happVerPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_USER_AGENT_HAPP_VERSION) as? EditTextPreference
@@ -327,6 +339,7 @@ class SettingsActivity : BaseActivity() {
             // Initialize HWID user-agent UI state
             val hwidUaPresetPref = findPreference<ListPreference>(AppConfig.PREF_HWID_USER_AGENT_PRESET)
             val hwidV2raytunPlatformPref = findPreference<ListPreference>(AppConfig.PREF_HWID_V2RAYTUN_PLATFORM)
+            val hwidFlclashxPlatformPref = findPreference<ListPreference>(AppConfig.PREF_HWID_FLCLASHX_PLATFORM)
             val hwidUaPref = findPreference<EditTextPreference>(AppConfig.PREF_HWID_USER_AGENT)
             val hwidUaHappVerPref = findPreference<EditTextPreference>(AppConfig.PREF_HWID_USER_AGENT_HAPP_VERSION)
             val hwidUaV2rayngVerPref = findPreference<EditTextPreference>(AppConfig.PREF_HWID_USER_AGENT_V2RAYNG_VERSION)
@@ -338,9 +351,13 @@ class SettingsActivity : BaseActivity() {
             val showV2rayngVer = hwidEnabled && preset == "v2rayng"
             val showFlclashxVer = hwidEnabled && preset == "flclashx"
             val showV2raytunPlatform = hwidEnabled && preset == "v2raytun"
+            val showFlclashxPlatform = hwidEnabled && preset == "flclashx"
 
             hwidV2raytunPlatformPref?.isVisible = showV2raytunPlatform
             hwidV2raytunPlatformPref?.isEnabled = showV2raytunPlatform
+
+            hwidFlclashxPlatformPref?.isVisible = showFlclashxPlatform
+            hwidFlclashxPlatformPref?.isEnabled = showFlclashxPlatform
 
             hwidUaPref?.isVisible = showCustomUa
             hwidUaPref?.isEnabled = showCustomUa

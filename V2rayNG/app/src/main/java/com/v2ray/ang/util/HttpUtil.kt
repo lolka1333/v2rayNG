@@ -177,17 +177,21 @@ object HttpUtil {
                         val p = platform?.trim().orEmpty().ifEmpty { "android" }
                         "v2raytun/${p}"
                     }
-                    "v2raytun_ios" -> "v2raytun/ios" // backward compatibility
                     "flclashx" -> {
+                        val platform = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(
+                            AppConfig.PREF_HWID_FLCLASHX_PLATFORM,
+                            "android",
+                        )
+                        val p = platform?.trim().orEmpty().ifEmpty { "android" }
                         val ver = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(
                             AppConfig.PREF_HWID_USER_AGENT_FLCLASHX_VERSION,
                             "0.3.0",
                         )
                         val v = ver?.trim().orEmpty()
                         if (v.isEmpty()) {
-                            "FlClash X Platform/android"
+                            "FlClash X Platform/${p}"
                         } else {
-                            "FlClash X/v${v} Platform/android"
+                            "FlClash X/v${v} Platform/${p}"
                         }
                     }
                     "custom" -> null
@@ -215,8 +219,8 @@ object HttpUtil {
                         
                         // Custom or Default OS
                         val customOs = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_OS)
-                        val osToSend = if (!customOs.isNullOrEmpty()) customOs else Utils.getDeviceOS()
-                        conn.setRequestProperty("X-Device-OS", osToSend)
+                        val osToSendRaw = if (!customOs.isNullOrEmpty()) customOs else Utils.getDeviceOS()
+                        conn.setRequestProperty("X-Device-OS", Utils.getHwidOsHeaderValue(osToSendRaw))
 
                         // Custom or Default OS Version
                         val customVer = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_OS_VER)
@@ -239,7 +243,7 @@ object HttpUtil {
                     val realHwid = Utils.getHardwareId(com.v2ray.ang.AngApplication.application)
                      if (realHwid.isNotEmpty()) {
                         conn.setRequestProperty("X-HWID", realHwid)
-                        conn.setRequestProperty("X-Device-OS", Utils.getDeviceOS())
+                        conn.setRequestProperty("X-Device-OS", Utils.getHwidOsHeaderValue(Utils.getDeviceOS()))
                         conn.setRequestProperty("X-Ver-OS", android.os.Build.VERSION.RELEASE)
                         conn.setRequestProperty("X-Device-Locale", Locale.getDefault().language)
                         conn.setRequestProperty("X-Device-Model", Utils.getDeviceModel())

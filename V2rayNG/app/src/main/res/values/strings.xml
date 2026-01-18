@@ -21,6 +21,7 @@
     <string name="title_pref_hwid_user_agent_v2rayng_version">v2rayNG version</string>
     <string name="summary_pref_hwid_user_agent_v2rayng_version">Version part for v2rayNG/&lt;version&gt; preset (default is app version)</string>
     <string name="title_pref_hwid_user_agent_flclashx_version">FlClashX version</string>
+    <string name="title_pref_hwid_flclashx_platform">FlClashX platform</string>
     <string name="summary_pref_hwid_user_agent_flclashx_version">Version part for FlClash X/v&lt;version&gt; preset</string>
     <string name="app_name" translatable="false">v2rayNG</string>
     <string name="app_widget_name">Switch</string>

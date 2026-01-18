@@ -194,6 +194,15 @@
             android:title="@string/title_pref_hwid_user_agent_flclashx_version"
             android:summary="@string/summary_pref_hwid_user_agent_flclashx_version" />
 
+        <ListPreference
+            android:key="pref_hwid_flclashx_platform"
+            android:dependency="pref_hwid_enabled"
+            android:title="@string/title_pref_hwid_flclashx_platform"
+            android:summary="%s"
+            android:entries="@array/hwid_flclashx_platform_entries"
+            android:entryValues="@array/hwid_flclashx_platform_values"
+            android:defaultValue="android" />
+
         <EditTextPreference
             android:key="pref_hwid_user_agent"
             android:dependency="pref_hwid_enabled"

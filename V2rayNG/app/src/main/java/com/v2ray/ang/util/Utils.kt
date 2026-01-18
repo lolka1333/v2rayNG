@@ -413,6 +413,19 @@ object Utils {
         return "android"
     }
 
+    fun getHwidOsHeaderValue(os: String?): String {
+        val v = os?.trim().orEmpty()
+        if (v.isEmpty()) return "Android"
+        return when (v.lowercase(Locale.US)) {
+            "android" -> "Android"
+            "ios" -> "iOS"
+            "windows" -> "Windows"
+            "macos" -> "macOS"
+            "linux" -> "Linux"
+            else -> v
+        }
+    }
+
     /**
      * Get the device Model (e.g. Pixel 6).
      */
