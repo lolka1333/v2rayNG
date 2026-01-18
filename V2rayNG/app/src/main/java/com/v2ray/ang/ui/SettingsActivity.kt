@@ -109,10 +109,22 @@ class SettingsActivity : BaseActivity() {
             fun syncHwidUaUiState() {
                 val enabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_HWID_ENABLED, false)
                 val preset = hwidUaPresetPref?.value ?: MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_USER_AGENT_PRESET, "auto")
-                hwidUaPref?.isEnabled = enabled && preset == "custom"
-                hwidUaHappVerPref?.isEnabled = enabled && preset == "happ"
-                hwidUaV2rayngVerPref?.isEnabled = enabled && preset == "v2rayng"
-                hwidUaFlclashxVerPref?.isEnabled = enabled && preset == "flclashx"
+                val showCustomUa = enabled && preset == "custom"
+                val showHappVer = enabled && preset == "happ"
+                val showV2rayngVer = enabled && preset == "v2rayng"
+                val showFlclashxVer = enabled && preset == "flclashx"
+
+                hwidUaPref?.isVisible = showCustomUa
+                hwidUaPref?.isEnabled = showCustomUa
+
+                hwidUaHappVerPref?.isVisible = showHappVer
+                hwidUaHappVerPref?.isEnabled = showHappVer
+
+                hwidUaV2rayngVerPref?.isVisible = showV2rayngVer
+                hwidUaV2rayngVerPref?.isEnabled = showV2rayngVer
+
+                hwidUaFlclashxVerPref?.isVisible = showFlclashxVer
+                hwidUaFlclashxVerPref?.isEnabled = showFlclashxVer
             }
 
             hwidUaPresetPref?.setOnPreferenceChangeListener { _, newValue ->
@@ -121,10 +133,22 @@ class SettingsActivity : BaseActivity() {
                 val preset = newValue?.toString().orEmpty()
                 val idx = hwidUaPresetPref.findIndexOfValue(preset)
                 hwidUaPresetPref.summary = (if (idx >= 0) hwidUaPresetPref.entries[idx] else preset) as CharSequence?
-                hwidUaPref?.isEnabled = enabled && preset == "custom"
-                hwidUaHappVerPref?.isEnabled = enabled && preset == "happ"
-                hwidUaV2rayngVerPref?.isEnabled = enabled && preset == "v2rayng"
-                hwidUaFlclashxVerPref?.isEnabled = enabled && preset == "flclashx"
+                val showCustomUa = enabled && preset == "custom"
+                val showHappVer = enabled && preset == "happ"
+                val showV2rayngVer = enabled && preset == "v2rayng"
+                val showFlclashxVer = enabled && preset == "flclashx"
+
+                hwidUaPref?.isVisible = showCustomUa
+                hwidUaPref?.isEnabled = showCustomUa
+
+                hwidUaHappVerPref?.isVisible = showHappVer
+                hwidUaHappVerPref?.isEnabled = showHappVer
+
+                hwidUaV2rayngVerPref?.isVisible = showV2rayngVer
+                hwidUaV2rayngVerPref?.isEnabled = showV2rayngVer
+
+                hwidUaFlclashxVerPref?.isVisible = showFlclashxVer
+                hwidUaFlclashxVerPref?.isEnabled = showFlclashxVer
                 true
             }
             syncHwidUaUiState()
@@ -279,10 +303,22 @@ class SettingsActivity : BaseActivity() {
             val hwidUaFlclashxVerPref = findPreference<EditTextPreference>(AppConfig.PREF_HWID_USER_AGENT_FLCLASHX_VERSION)
             val hwidEnabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_HWID_ENABLED, false)
             val preset = hwidUaPresetPref?.value ?: MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_USER_AGENT_PRESET, "auto")
-            hwidUaPref?.isEnabled = hwidEnabled && preset == "custom"
-            hwidUaHappVerPref?.isEnabled = hwidEnabled && preset == "happ"
-            hwidUaV2rayngVerPref?.isEnabled = hwidEnabled && preset == "v2rayng"
-            hwidUaFlclashxVerPref?.isEnabled = hwidEnabled && preset == "flclashx"
+            val showCustomUa = hwidEnabled && preset == "custom"
+            val showHappVer = hwidEnabled && preset == "happ"
+            val showV2rayngVer = hwidEnabled && preset == "v2rayng"
+            val showFlclashxVer = hwidEnabled && preset == "flclashx"
+
+            hwidUaPref?.isVisible = showCustomUa
+            hwidUaPref?.isEnabled = showCustomUa
+
+            hwidUaHappVerPref?.isVisible = showHappVer
+            hwidUaHappVerPref?.isEnabled = showHappVer
+
+            hwidUaV2rayngVerPref?.isVisible = showV2rayngVer
+            hwidUaV2rayngVerPref?.isEnabled = showV2rayngVer
+
+            hwidUaFlclashxVerPref?.isVisible = showFlclashxVer
+            hwidUaFlclashxVerPref?.isEnabled = showFlclashxVer
 
             // Initialize mux-dependent UI states
             updateMux(MmkvManager.decodeSettingsBool(AppConfig.PREF_MUX_ENABLED, false))
