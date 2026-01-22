@@ -53,6 +53,9 @@ class SettingsActivity : BaseActivity() {
         private val autoUpdateCheck by lazy { findPreference<CheckBoxPreference>(AppConfig.SUBSCRIPTION_AUTO_UPDATE) }
         private val autoUpdateInterval by lazy { findPreference<EditTextPreference>(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL) }
         private val mode by lazy { findPreference<ListPreference>(AppConfig.PREF_MODE) }
+        private val hevTunLogLevel by lazy { findPreference<ListPreference>(AppConfig.PREF_HEV_TUNNEL_LOGLEVEL) }
+        private val hevTunRwTimeout by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT) }
+        private val useHevTun by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_USE_HEV_TUNNEL) }
 
         override fun onCreatePreferences(bundle: Bundle?, s: String?) {
             // Use MMKV as the storage backend for all Preferences
@@ -95,11 +98,21 @@ class SettingsActivity : BaseActivity() {
                 }
                 true
             }
-            mode?.setOnPreferenceChangeListener { _, newValue ->
-                updateMode(newValue.toString())
+            mode?.setOnPreferenceChangeListener { pref, newValue ->
+                val valueStr = newValue.toString()
+                (pref as? ListPreference)?.let { lp ->
+                    val idx = lp.findIndexOfValue(valueStr)
+                    lp.summary = if (idx >= 0) lp.entries[idx] else valueStr
+                }
+                updateMode(valueStr)
                 true
             }
             mode?.dialogLayoutResource = R.layout.preference_with_help_link
+
+            useHevTun?.setOnPreferenceChangeListener { _, newValue ->
+                updateHevTunSettings(newValue as Boolean)
+                true
+            }
 
             val hwidUaPresetPref = findPreference<ListPreference>(AppConfig.PREF_HWID_USER_AGENT_PRESET)
             val hwidV2raytunPlatformPref = findPreference<ListPreference>(AppConfig.PREF_HWID_V2RAYTUN_PLATFORM)
@@ -333,6 +346,7 @@ class SettingsActivity : BaseActivity() {
 
         override fun onStart() {
             super.onStart()
+            updateHevTunSettings(MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, true))
             // Initialize mode-dependent UI states
             updateMode(MmkvManager.decodeSettingsString(AppConfig.PREF_MODE, VPN))
 
@@ -382,8 +396,8 @@ class SettingsActivity : BaseActivity() {
 
         }
 
-        private fun updateMode(mode: String?) {
-            val vpn = mode == VPN
+        private fun updateMode(value: String?) {
+            val vpn = value == VPN
             localDns?.isEnabled = vpn
             fakeDns?.isEnabled = vpn
             appendHttpProxy?.isEnabled = vpn
@@ -392,6 +406,8 @@ class SettingsActivity : BaseActivity() {
             vpnBypassLan?.isEnabled = vpn
             vpnInterfaceAddress?.isEnabled = vpn
             vpnMtu?.isEnabled = vpn
+            useHevTun?.isEnabled = vpn
+            updateHevTunSettings(false)
             if (vpn) {
                 updateLocalDns(
                     MmkvManager.decodeSettingsBool(
@@ -399,7 +415,18 @@ class SettingsActivity : BaseActivity() {
                         false
                     )
                 )
+                updateHevTunSettings(
+                    MmkvManager.decodeSettingsBool(
+                        AppConfig.PREF_USE_HEV_TUNNEL,
+                        false
+                    )
+                )
             }
+        }
+
+        private fun updateHevTunSettings(enabled: Boolean) {
+            hevTunLogLevel?.isEnabled = enabled
+            hevTunRwTimeout?.isEnabled = enabled
         }
 
         private fun updateLocalDns(enabled: Boolean) {
