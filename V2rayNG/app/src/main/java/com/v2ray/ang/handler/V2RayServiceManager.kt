@@ -111,7 +111,7 @@ object V2RayServiceManager {
             context.toast(R.string.toast_services_start)
         }
 
-        val isVpnMode = (MmkvManager.decodeSettingsString(AppConfig.PREF_MODE) ?: AppConfig.VPN) == AppConfig.VPN
+        val isVpnMode = SettingsManager.isVpnMode()
         if (isVpnMode) {
             val prepareIntent = VpnService.prepare(context)
             if (prepareIntent != null) {

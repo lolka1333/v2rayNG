@@ -106,7 +106,7 @@ class SubSettingActivity : BaseActivity() {
     }
 
     private inner class ActivityAdapterListener : BaseAdapterListener {
-        override fun onEdit(guid: String) {
+        override fun onEdit(guid: String, position: Int) {
             startActivity(
                 Intent(ownerActivity, SubEditActivity::class.java)
                     .putExtra("subId", guid)
