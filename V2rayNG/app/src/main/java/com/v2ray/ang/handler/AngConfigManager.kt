@@ -19,13 +19,13 @@ import com.v2ray.ang.fmt.VlessFmt
 import com.v2ray.ang.fmt.VmessFmt
 import com.v2ray.ang.fmt.WireguardFmt
 import com.v2ray.ang.util.HttpUtil
+import com.v2ray.ang.util.HappCrypt
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.QRCodeDecoder
 import com.v2ray.ang.util.Utils
 import java.net.URI
 
 object AngConfigManager {
-
 
     /**
      * Shares the configuration to the clipboard.
@@ -48,6 +48,21 @@ object AngConfigManager {
             return -1
         }
         return 0
+    }
+
+    private fun preprocessHappLinks(servers: String?): String? {
+        if (servers.isNullOrEmpty()) return servers
+
+        val out = ArrayList<String>()
+        servers.lines().forEach { line ->
+            val decrypted = HappCrypt.tryDecrypt(line)
+            if (decrypted.isNullOrEmpty()) {
+                out.add(line)
+            } else {
+                decrypted.lines().forEach { out.add(it) }
+            }
+        }
+        return out.joinToString("\n")
     }
 
     /**
@@ -159,17 +174,19 @@ object AngConfigManager {
      * @return A pair containing the number of configurations and subscriptions imported.
      */
     fun importBatchConfig(server: String?, subid: String, append: Boolean): Pair<Int, Int> {
-        var count = parseBatchConfig(Utils.decode(server), subid, append)
+        val preprocessedServer = preprocessHappLinks(server)
+
+        var count = parseBatchConfig(Utils.decode(preprocessedServer), subid, append)
         if (count <= 0) {
-            count = parseBatchConfig(server, subid, append)
+            count = parseBatchConfig(preprocessedServer, subid, append)
         }
         if (count <= 0) {
-            count = parseCustomConfigServer(server, subid)
+            count = parseCustomConfigServer(preprocessedServer, subid)
         }
 
-        var countSub = parseBatchSubscription(server)
+        var countSub = parseBatchSubscription(preprocessedServer)
         if (countSub <= 0) {
-            countSub = parseBatchSubscription(Utils.decode(server))
+            countSub = parseBatchSubscription(Utils.decode(preprocessedServer))
         }
         if (countSub > 0) {
             updateConfigViaSubAll()
@@ -462,12 +479,14 @@ object AngConfigManager {
      * @return The number of configurations parsed.
      */
     private fun parseConfigViaSub(server: String?, subid: String, append: Boolean): Int {
-        var count = parseBatchConfig(Utils.decode(server), subid, append)
+        val preprocessedServer = preprocessHappLinks(server)
+
+        var count = parseBatchConfig(Utils.decode(preprocessedServer), subid, append)
         if (count <= 0) {
-            count = parseBatchConfig(server, subid, append)
+            count = parseBatchConfig(preprocessedServer, subid, append)
         }
         if (count <= 0) {
-            count = parseCustomConfigServer(server, subid)
+            count = parseCustomConfigServer(preprocessedServer, subid)
         }
         return count
     }
