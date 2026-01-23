@@ -14,6 +14,7 @@ import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
+import com.v2ray.ang.util.HappCrypt
 import com.v2ray.ang.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -90,12 +91,14 @@ class SubEditActivity : BaseActivity() {
             return false
         }
         if (subItem.url.isNotEmpty()) {
-            if (!Utils.isValidUrl(subItem.url)) {
+            val effectiveUrl = HappCrypt.tryDecrypt(subItem.url) ?: subItem.url
+
+            if (!Utils.isValidUrl(effectiveUrl)) {
                 toast(R.string.toast_invalid_url)
                 return false
             }
 
-            if (!Utils.isValidSubUrl(subItem.url)) {
+            if (!Utils.isValidSubUrl(effectiveUrl)) {
                 toast(R.string.toast_insecure_url_protocol)
                 if (!subItem.allowInsecureUrl) {
                     return false

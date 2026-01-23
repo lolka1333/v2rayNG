@@ -427,7 +427,8 @@ object AngConfigManager {
             if (!it.second.enabled) {
                 return 0
             }
-            val url = HttpUtil.toIdnUrl(it.second.url)
+            val rawUrl = HttpUtil.toIdnUrl(it.second.url)
+            val url = HappCrypt.tryDecrypt(rawUrl) ?: rawUrl
             if (!Utils.isValidUrl(url)) {
                 return 0
             }
