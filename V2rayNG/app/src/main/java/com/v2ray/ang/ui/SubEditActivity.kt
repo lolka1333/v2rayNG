@@ -91,7 +91,8 @@ class SubEditActivity : BaseActivity() {
             return false
         }
         if (subItem.url.isNotEmpty()) {
-            val effectiveUrl = HappCrypt.tryDecrypt(subItem.url) ?: subItem.url
+            val decryptedUrl = HappCrypt.tryDecrypt(subItem.url)
+            val effectiveUrl = decryptedUrl ?: subItem.url
 
             if (!Utils.isValidUrl(effectiveUrl)) {
                 toast(R.string.toast_invalid_url)
@@ -103,6 +104,10 @@ class SubEditActivity : BaseActivity() {
                 if (!subItem.allowInsecureUrl) {
                     return false
                 }
+            }
+
+            if (decryptedUrl != null) {
+                subItem.url = effectiveUrl
             }
         }
 

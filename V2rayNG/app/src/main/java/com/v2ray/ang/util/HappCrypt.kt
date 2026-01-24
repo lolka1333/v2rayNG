@@ -1,5 +1,6 @@
 package com.v2ray.ang.util
 
+import android.net.Uri
 import android.util.Base64
 import java.math.BigInteger
 import java.nio.ByteBuffer
@@ -121,49 +122,58 @@ object HappCrypt {
     }
 
     fun tryDecrypt(input: String?): String? {
-        if (input.isNullOrBlank()) return null
+        try {
+            if (input.isNullOrBlank()) return null
 
-        val raw = input.trim()
-        if (!raw.startsWith(PREFIX)) return null
+            var raw = input.trim()
+            if (raw.startsWith(PREFIX)) {
+                raw = Uri.decode(raw)
+            }
+            if (!raw.startsWith(PREFIX)) return null
 
-        val slash = raw.indexOf('/', PREFIX.length)
-        if (slash <= 0) return null
+            val slash = raw.indexOf('/', PREFIX.length)
+            if (slash <= 0) return null
 
-        val host = raw.substring(PREFIX.length, slash)
-        val payload = raw.substring(slash + 1)
+            val host = raw.substring(PREFIX.length, slash)
+            val payload = raw.substring(slash + 1)
 
-        val rsaPrivateKeys = when (host) {
-            "crypt4" -> rsaPkcs1v15PrivateKeys
-            "crypt3" -> emptyList()
-            "crypt2" -> emptyList()
-            "crypt" -> emptyList()
-            else -> emptyList()
+            val rsaPrivateKeys = when (host) {
+                "crypt4" -> rsaPkcs1v15PrivateKeys
+                "crypt3" -> emptyList()
+                "crypt2" -> emptyList()
+                "crypt" -> emptyList()
+                else -> emptyList()
+            }
+            if (rsaPrivateKeys.isEmpty()) return null
+
+            val cleaned = payload
+                .replace(' ', '+')
+                .replace(Regex("[^A-Za-z0-9+/=_-]"), "")
+                .replace('-', '+')
+                .replace('_', '/')
+                .trimEnd('=')
+
+            val maxCiphertextSizeBytes = rsaPrivateKeys.maxOf { it.keySizeBytes }
+            val ciphertextBytes = findCiphertextBytes(cleaned, maxCiphertextSizeBytes) ?: return null
+            val ciphertextInt = BigInteger(1, ciphertextBytes)
+
+            for (privateKey in rsaPrivateKeys) {
+                val encodedMessageInt = ciphertextInt.modPow(privateKey.privateExponent, privateKey.modulus)
+                val encodedMessageBytes = toFixedLength(encodedMessageInt, privateKey.keySizeBytes)
+                val plaintextBytes = pkcs1v15Unpad(encodedMessageBytes) ?: continue
+
+                val decoder = Charsets.UTF_8
+                    .newDecoder()
+                    .onMalformedInput(CodingErrorAction.IGNORE)
+                    .onUnmappableCharacter(CodingErrorAction.IGNORE)
+
+                return decoder.decode(ByteBuffer.wrap(plaintextBytes)).toString()
+            }
+
+            return null
+        } catch (_: Exception) {
+            return null
         }
-        if (rsaPrivateKeys.isEmpty()) return null
-
-        val cleaned = payload
-            .replace(Regex("[^A-Za-z0-9+/=_-]"), "")
-            .replace('-', '+')
-            .replace('_', '/')
-            .trimEnd('=')
-
-        val ciphertextBytes = findCiphertextBytes(cleaned) ?: return null
-        val ciphertextInt = BigInteger(1, ciphertextBytes)
-
-        for (privateKey in rsaPrivateKeys) {
-            val encodedMessageInt = ciphertextInt.modPow(privateKey.privateExponent, privateKey.modulus)
-            val encodedMessageBytes = toFixedLength(encodedMessageInt, privateKey.keySizeBytes)
-            val plaintextBytes = pkcs1v15Unpad(encodedMessageBytes) ?: continue
-
-            val decoder = Charsets.UTF_8
-                .newDecoder()
-                .onMalformedInput(CodingErrorAction.IGNORE)
-                .onUnmappableCharacter(CodingErrorAction.IGNORE)
-
-            return decoder.decode(ByteBuffer.wrap(plaintextBytes)).toString()
-        }
-
-        return null
     }
 
     private fun pkcs1v15Unpad(block: ByteArray): ByteArray? {
@@ -185,7 +195,7 @@ object HappCrypt {
         return block.copyOfRange(sep + 1, block.size)
     }
 
-    private fun findCiphertextBytes(body: String): ByteArray? {
+    private fun findCiphertextBytes(body: String, maxSizeBytes: Int): ByteArray? {
         for (c in 0..8) {
             var t = if (c == 0) body else body.dropLast(c)
             while (t.length % 4 == 1 && t.isNotEmpty()) {
@@ -202,8 +212,11 @@ object HappCrypt {
                 continue
             }
 
-            if (decoded.size == 512) {
+            if (decoded.isNotEmpty() && decoded.size <= maxSizeBytes) {
                 return decoded
+            }
+            if (decoded.size == maxSizeBytes + 1 && decoded[0] == 0.toByte()) {
+                return decoded.copyOfRange(1, decoded.size)
             }
         }
         return null
