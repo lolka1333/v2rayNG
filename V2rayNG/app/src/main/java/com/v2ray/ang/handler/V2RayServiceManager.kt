@@ -5,13 +5,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.net.VpnService
 import android.os.ParcelFileDescriptor
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
-import com.v2ray.ang.dto.EConfigType
+import com.v2ray.ang.enums.EConfigType
 import com.v2ray.ang.dto.ProfileItem
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.service.ServiceControl
@@ -94,7 +93,6 @@ object V2RayServiceManager {
         if (coreController.isRunning) {
             return
         }
-
         val guid = MmkvManager.getSelectServer() ?: return
         val config = MmkvManager.decodeServerConfig(guid) ?: return
         if (config.configType != EConfigType.CUSTOM
@@ -110,36 +108,12 @@ object V2RayServiceManager {
         } else {
             context.toast(R.string.toast_services_start)
         }
-
-        val isVpnMode = SettingsManager.isVpnMode()
-        if (isVpnMode) {
-            val prepareIntent = VpnService.prepare(context)
-            if (prepareIntent != null) {
-                context.toast(R.string.toast_permission_denied)
-                return
-            }
-        }
-
-        val intent = if (isVpnMode) {
+        val intent = if (SettingsManager.isVpnMode()) {
             Intent(context.applicationContext, V2RayVpnService::class.java)
         } else {
             Intent(context.applicationContext, V2RayProxyOnlyService::class.java)
         }
-        try {
-            ContextCompat.startForegroundService(context, intent)
-        } catch (e: SecurityException) {
-            Log.e(AppConfig.TAG, "Failed to start foreground service (SecurityException)", e)
-            context.toast(R.string.toast_services_failure)
-            MessageUtil.sendMsg2UI(context, AppConfig.MSG_STATE_START_FAILURE, "")
-        } catch (e: IllegalStateException) {
-            Log.e(AppConfig.TAG, "Failed to start foreground service (IllegalStateException)", e)
-            context.toast(R.string.toast_services_failure)
-            MessageUtil.sendMsg2UI(context, AppConfig.MSG_STATE_START_FAILURE, "")
-        } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to start foreground service", e)
-            context.toast(R.string.toast_services_failure)
-            MessageUtil.sendMsg2UI(context, AppConfig.MSG_STATE_START_FAILURE, "")
-        }
+        ContextCompat.startForegroundService(context, intent)
     }
 
     /**
@@ -185,13 +159,13 @@ object V2RayServiceManager {
 
         if (coreController.isRunning == false) {
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_FAILURE, "")
-            NotificationManager.cancelNotification(service)
+            NotificationManager.cancelNotification()
             return false
         }
 
         try {
             MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_START_SUCCESS, "")
-            NotificationManager.showNotification(service, currentConfig)
+            NotificationManager.showNotification(currentConfig)
             NotificationManager.startSpeedNotification(currentConfig)
 
         } catch (e: Exception) {
@@ -220,7 +194,7 @@ object V2RayServiceManager {
         }
 
         MessageUtil.sendMsg2UI(service, AppConfig.MSG_STATE_STOP_SUCCESS, "")
-        NotificationManager.cancelNotification(service)
+        NotificationManager.cancelNotification()
 
         try {
             service.unregisterReceiver(mMsgReceive)
