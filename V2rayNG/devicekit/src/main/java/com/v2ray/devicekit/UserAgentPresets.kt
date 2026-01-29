@@ -1,4 +1,4 @@
-package com.v2ray.hwidkit
+package com.v2ray.devicekit
 
 import java.util.Locale
 

@@ -1,6 +1,6 @@
-package com.v2ray.hwidkit
+package com.v2ray.devicekit
 
-internal object HwidDefaults {
+internal object Defaults {
     const val OS_VALUE_ANDROID = "android"
 
     const val HAPP_VERSION = "3.8.1"

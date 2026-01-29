@@ -15,6 +15,7 @@ import com.v2ray.ang.extension.toastSuccess
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.util.Utils
+import com.v2ray.devicekit.Compat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -76,7 +77,8 @@ class SubEditActivity : BaseActivity() {
         val subItem = MmkvManager.decodeSubscription(editSubId) ?: SubscriptionItem()
 
         subItem.remarks = binding.etRemarks.text.toString()
-        subItem.url = binding.etUrl.text.toString()
+        val url = binding.etUrl.text.toString()
+        subItem.url = Compat.decryptSubscriptionUrl(url) ?: url
         subItem.userAgent = binding.etUserAgent.text.toString()
         subItem.filter = binding.etFilter.text.toString()
         subItem.enabled = binding.chkEnable.isChecked

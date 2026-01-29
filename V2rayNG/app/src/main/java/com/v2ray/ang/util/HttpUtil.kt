@@ -4,8 +4,8 @@ import android.util.Log
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
-import com.v2ray.hwidkit.HwidKit
-import com.v2ray.hwidkit.V2rayNgCompat
+import com.v2ray.devicekit.Kit
+import com.v2ray.devicekit.Compat
 import com.v2ray.ang.util.Utils.encode
 import com.v2ray.ang.util.Utils.urlDecode
 import java.io.IOException
@@ -141,11 +141,11 @@ object HttpUtil {
 
         while (redirects++ < maxRedirects) {
             if (currentUrl == null) continue
-            val effectiveUrl = V2rayNgCompat.normalizeSubscriptionUrl(currentUrl) ?: currentUrl
+            val effectiveUrl = Compat.decryptSubscriptionUrl(currentUrl) ?: currentUrl
             val conn = createProxyConnection(effectiveUrl, httpPort, timeout, timeout) ?: continue
 
             try {
-                HwidKit.applyToConnectionFromV2rayNgSettings(
+                Kit.applyToConnectionFromSettings(
                     conn = conn,
                     context = com.v2ray.ang.AngApplication.application,
                     subscriptionUserAgent = userAgent,
@@ -172,7 +172,7 @@ object HttpUtil {
 
                 else -> try {
                     val text = conn.inputStream.use { it.bufferedReader().readText() }
-                    return V2rayNgCompat.expandHappLinksInText(text) ?: text
+                    return Compat.expandHappLinksInText(text) ?: text
                 } finally {
                     conn.disconnect()
                 }

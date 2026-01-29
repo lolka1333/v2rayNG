@@ -140,7 +140,7 @@ dependencies {
     // Core Libraries
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.aar", "*.jar"))))
 
-    implementation(project(":hwidkit"))
+    implementation(project(":devicekit"))
 
     // AndroidX Core Libraries
     implementation(libs.androidx.core.ktx)

@@ -1,6 +1,6 @@
-package com.v2ray.hwidkit
+package com.v2ray.devicekit
 
-internal object HwidPreferenceKeys {
+internal object PrefKeys {
     const val HWID_ENABLED = "pref_hwid_enabled"
     const val HWID_VAL = "pref_hwid_val"
     const val HWID_OS = "pref_hwid_os"

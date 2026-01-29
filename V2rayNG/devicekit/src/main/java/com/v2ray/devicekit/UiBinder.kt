@@ -1,11 +1,11 @@
-package com.v2ray.hwidkit
+package com.v2ray.devicekit
 
 import androidx.preference.CheckBoxPreference
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
 
-object HwidUiBinder {
+object UiBinder {
 
     private data class Prefs(
         val hwidEnabled: CheckBoxPreference?,
@@ -56,19 +56,19 @@ object HwidUiBinder {
 
     private fun prefs(fragment: PreferenceFragmentCompat): Prefs {
         return Prefs(
-            hwidEnabled = fragment.findPreference(HwidPreferenceKeys.HWID_ENABLED),
-            hwidVal = fragment.findPreference(HwidPreferenceKeys.HWID_VAL),
-            hwidOs = fragment.findPreference(HwidPreferenceKeys.HWID_OS),
-            hwidOsVer = fragment.findPreference(HwidPreferenceKeys.HWID_OS_VER),
-            hwidModel = fragment.findPreference(HwidPreferenceKeys.HWID_MODEL),
-            hwidLocale = fragment.findPreference(HwidPreferenceKeys.HWID_LOCALE),
-            uaPreset = fragment.findPreference(HwidPreferenceKeys.UA_PRESET),
-            uaCustom = fragment.findPreference(HwidPreferenceKeys.UA_CUSTOM),
-            uaHappVersion = fragment.findPreference(HwidPreferenceKeys.UA_HAPP_VERSION),
-            uaV2rayngVersion = fragment.findPreference(HwidPreferenceKeys.UA_V2RAYNG_VERSION),
-            uaV2raytunPlatform = fragment.findPreference(HwidPreferenceKeys.UA_V2RAYTUN_PLATFORM),
-            uaFlclashxVersion = fragment.findPreference(HwidPreferenceKeys.UA_FLCLASHX_VERSION),
-            uaFlclashxPlatform = fragment.findPreference(HwidPreferenceKeys.UA_FLCLASHX_PLATFORM),
+            hwidEnabled = fragment.findPreference(PrefKeys.HWID_ENABLED),
+            hwidVal = fragment.findPreference(PrefKeys.HWID_VAL),
+            hwidOs = fragment.findPreference(PrefKeys.HWID_OS),
+            hwidOsVer = fragment.findPreference(PrefKeys.HWID_OS_VER),
+            hwidModel = fragment.findPreference(PrefKeys.HWID_MODEL),
+            hwidLocale = fragment.findPreference(PrefKeys.HWID_LOCALE),
+            uaPreset = fragment.findPreference(PrefKeys.UA_PRESET),
+            uaCustom = fragment.findPreference(PrefKeys.UA_CUSTOM),
+            uaHappVersion = fragment.findPreference(PrefKeys.UA_HAPP_VERSION),
+            uaV2rayngVersion = fragment.findPreference(PrefKeys.UA_V2RAYNG_VERSION),
+            uaV2raytunPlatform = fragment.findPreference(PrefKeys.UA_V2RAYTUN_PLATFORM),
+            uaFlclashxVersion = fragment.findPreference(PrefKeys.UA_FLCLASHX_VERSION),
+            uaFlclashxPlatform = fragment.findPreference(PrefKeys.UA_FLCLASHX_PLATFORM),
         )
     }
 
@@ -89,12 +89,12 @@ object HwidUiBinder {
         prefs.hwidLocale?.isVisible = showGroup
         prefs.uaPreset?.isVisible = showGroup
 
-        val normalized = UserAgentPreset.fromKey(preset)
-        val showHapp = showGroup && normalized.isHapp
-        val showV2rayng = showGroup && normalized == UserAgentPreset.V2RAYNG
-        val showV2raytun = showGroup && normalized == UserAgentPreset.V2RAYTUN
-        val showFlclashx = showGroup && normalized == UserAgentPreset.FLCLASHX
-        val showCustom = showGroup && normalized == UserAgentPreset.CUSTOM
+        val uaPreset = UserAgentPreset.fromKey(preset)
+        val showHapp = showGroup && uaPreset.isHapp
+        val showV2rayng = showGroup && uaPreset == UserAgentPreset.V2RAYNG
+        val showV2raytun = showGroup && uaPreset == UserAgentPreset.V2RAYTUN
+        val showFlclashx = showGroup && uaPreset == UserAgentPreset.FLCLASHX
+        val showCustom = showGroup && uaPreset == UserAgentPreset.CUSTOM
 
         prefs.uaHappVersion?.isVisible = showHapp
         prefs.uaV2rayngVersion?.isVisible = showV2rayng
@@ -105,17 +105,17 @@ object HwidUiBinder {
     }
 
     private fun applyDefaults(context: android.content.Context, prefs: Prefs) {
-        setTextIfBlank(prefs.hwidVal, HwidDeviceInfo.hardwareId(context))
-        setListIfBlank(prefs.hwidOs, HwidDeviceInfo.osValue())
-        setTextIfBlank(prefs.hwidOsVer, HwidDeviceInfo.osVersion())
-        setTextIfBlank(prefs.hwidModel, HwidDeviceInfo.model())
-        setTextIfBlank(prefs.hwidLocale, HwidDeviceInfo.locale())
+        setTextIfBlank(prefs.hwidVal, DeviceInfo.hardwareId(context))
+        setListIfBlank(prefs.hwidOs, DeviceInfo.osValue())
+        setTextIfBlank(prefs.hwidOsVer, DeviceInfo.osVersion())
+        setTextIfBlank(prefs.hwidModel, DeviceInfo.model())
+        setTextIfBlank(prefs.hwidLocale, DeviceInfo.locale())
 
-        setTextIfBlank(prefs.uaHappVersion, HwidDefaults.HAPP_VERSION)
-        setTextIfBlank(prefs.uaV2rayngVersion, HwidDeviceInfo.appVersionName(context))
-        setListIfBlank(prefs.uaV2raytunPlatform, HwidDefaults.V2RAYTUN_PLATFORM)
-        setTextIfBlank(prefs.uaFlclashxVersion, HwidDefaults.FLCLASHX_VERSION)
-        setListIfBlank(prefs.uaFlclashxPlatform, HwidDefaults.FLCLASHX_PLATFORM)
+        setTextIfBlank(prefs.uaHappVersion, Defaults.HAPP_VERSION)
+        setTextIfBlank(prefs.uaV2rayngVersion, DeviceInfo.appVersionName(context))
+        setListIfBlank(prefs.uaV2raytunPlatform, Defaults.V2RAYTUN_PLATFORM)
+        setTextIfBlank(prefs.uaFlclashxVersion, Defaults.FLCLASHX_VERSION)
+        setListIfBlank(prefs.uaFlclashxPlatform, Defaults.FLCLASHX_PLATFORM)
     }
 
     private fun setTextIfBlank(pref: EditTextPreference?, value: String) {

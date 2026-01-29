@@ -1,4 +1,4 @@
-package com.v2ray.hwidkit
+package com.v2ray.devicekit
 
 import android.net.Uri
 import android.util.Base64
@@ -6,7 +6,7 @@ import java.math.BigInteger
 import java.nio.ByteBuffer
 import java.nio.charset.CodingErrorAction
 
-object HappCrypt {
+object HappDecryptor {
     private const val PREFIX = "happ://"
 
     private fun bytesOf(vararg values: Int): ByteArray =

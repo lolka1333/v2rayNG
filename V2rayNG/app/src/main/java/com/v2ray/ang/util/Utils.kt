@@ -30,7 +30,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
-import com.v2ray.hwidkit.V2rayNgCompat
+import com.v2ray.devicekit.Compat
 
 object Utils {
 
@@ -268,7 +268,7 @@ object Utils {
     fun isValidUrl(value: String?): Boolean {
         if (value.isNullOrEmpty()) return false
 
-        val effective = V2rayNgCompat.normalizeSubscriptionUrl(value) ?: value
+        val effective = Compat.decryptSubscriptionUrl(value) ?: value
 
         return try {
             Patterns.WEB_URL.matcher(effective).matches() ||
@@ -467,7 +467,7 @@ object Utils {
     fun isValidSubUrl(value: String?): Boolean {
         if (value.isNullOrEmpty()) return false
 
-        val effective = V2rayNgCompat.normalizeSubscriptionUrl(value) ?: value
+        val effective = Compat.decryptSubscriptionUrl(value) ?: value
 
         try {
             if (URLUtil.isHttpsUrl(effective)) return true

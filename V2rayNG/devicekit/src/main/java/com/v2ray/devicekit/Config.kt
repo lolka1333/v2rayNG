@@ -1,6 +1,6 @@
-package com.v2ray.hwidkit
+package com.v2ray.devicekit
 
-data class HwidConfig(
+data class Config(
     val enabled: Boolean,
     val customHwid: String? = null,
     val customOs: String? = null,

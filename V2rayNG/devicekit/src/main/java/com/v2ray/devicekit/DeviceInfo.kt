@@ -1,4 +1,4 @@
-package com.v2ray.hwidkit
+package com.v2ray.devicekit
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -6,7 +6,7 @@ import android.os.Build
 import android.provider.Settings
 import java.util.Locale
 
-internal object HwidDeviceInfo {
+internal object DeviceInfo {
     fun hardwareId(context: Context): String {
         return try {
             Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID).orEmpty()
@@ -15,7 +15,7 @@ internal object HwidDeviceInfo {
         }
     }
 
-    fun osValue(): String = HwidDefaults.OS_VALUE_ANDROID
+    fun osValue(): String = Defaults.OS_VALUE_ANDROID
 
     fun osVersion(): String = Build.VERSION.RELEASE.orEmpty()
 

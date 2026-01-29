@@ -23,7 +23,7 @@ import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.QRCodeDecoder
 import com.v2ray.ang.util.Utils
-import com.v2ray.hwidkit.V2rayNgCompat
+import com.v2ray.devicekit.Compat
 import java.net.URI
 
 object AngConfigManager {
@@ -52,7 +52,7 @@ object AngConfigManager {
     }
 
     private fun preprocessHappLinks(servers: String?): String? {
-        return V2rayNgCompat.expandHappLinksInText(servers) ?: servers
+        return Compat.expandHappLinksInText(servers) ?: servers
     }
 
     /**

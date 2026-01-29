@@ -18,7 +18,7 @@ import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.helper.MmkvPreferenceDataStore
 import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.util.Utils
-import com.v2ray.hwidkit.HwidUiBinder
+import com.v2ray.devicekit.UiBinder
 import java.util.concurrent.TimeUnit
 
 class SettingsActivity : BaseActivity() {
@@ -66,7 +66,7 @@ class SettingsActivity : BaseActivity() {
 
             initPreferenceSummaries()
 
-            HwidUiBinder.bind(this)
+            UiBinder.bind(this)
 
             localDns?.setOnPreferenceChangeListener { _, any ->
                 updateLocalDns(any as Boolean)

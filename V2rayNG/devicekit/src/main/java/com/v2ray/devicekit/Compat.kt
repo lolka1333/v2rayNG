@@ -1,10 +1,10 @@
-package com.v2ray.hwidkit
+package com.v2ray.devicekit
 
-object V2rayNgCompat {
+object Compat {
 
-    fun normalizeSubscriptionUrl(rawUrl: String?): String? {
+    fun decryptSubscriptionUrl(rawUrl: String?): String? {
         if (rawUrl.isNullOrBlank()) return rawUrl
-        return HappCrypt.tryDecrypt(rawUrl) ?: rawUrl
+        return HappDecryptor.tryDecrypt(rawUrl) ?: rawUrl
     }
 
     fun expandHappLinksInText(text: String?): String? {
@@ -12,7 +12,7 @@ object V2rayNgCompat {
 
         val out = ArrayList<String>()
         text.lines().forEach { line ->
-            val decrypted = HappCrypt.tryDecrypt(line)
+            val decrypted = HappDecryptor.tryDecrypt(line)
             if (decrypted.isNullOrEmpty()) {
                 out.add(line)
             } else {

@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.v2ray.hwidkit"
+    namespace = "com.v2ray.devicekit"
     compileSdk = 36
 
     defaultConfig {

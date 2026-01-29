@@ -1,13 +1,13 @@
-package com.v2ray.hwidkit
+package com.v2ray.devicekit
 
 import android.content.Context
 import java.net.HttpURLConnection
 import java.util.Locale
 
-object HwidKit {
+object Kit {
 
     fun resolveUserAgent(
-        config: HwidConfig,
+        config: Config,
         subscriptionUserAgent: String?,
         defaultUserAgent: String,
     ): String {
@@ -19,7 +19,7 @@ object HwidKit {
 
         val presetUa = when (preset) {
             UserAgentPreset.HAPP -> {
-                val v = config.happVersion?.trim().orEmpty().ifEmpty { HwidDefaults.HAPP_VERSION }
+                val v = config.happVersion?.trim().orEmpty().ifEmpty { Defaults.HAPP_VERSION }
                 "Happ/$v"
             }
             UserAgentPreset.V2RAYNG -> {
@@ -27,11 +27,11 @@ object HwidKit {
                 if (v.isEmpty()) "v2rayNG" else "v2rayNG/$v"
             }
             UserAgentPreset.V2RAYTUN -> {
-                val p = config.v2raytunPlatform?.trim().orEmpty().ifEmpty { HwidDefaults.V2RAYTUN_PLATFORM }
+                val p = config.v2raytunPlatform?.trim().orEmpty().ifEmpty { Defaults.V2RAYTUN_PLATFORM }
                 "v2raytun/$p"
             }
             UserAgentPreset.FLCLASHX -> {
-                val p = config.flclashxPlatform?.trim().orEmpty().ifEmpty { HwidDefaults.FLCLASHX_PLATFORM }
+                val p = config.flclashxPlatform?.trim().orEmpty().ifEmpty { Defaults.FLCLASHX_PLATFORM }
                 val v = config.flclashxVersion?.trim().orEmpty()
                 if (v.isEmpty()) {
                     "FlClash X Platform/$p"
@@ -49,7 +49,7 @@ object HwidKit {
     fun applyToConnection(
         conn: HttpURLConnection,
         context: Context,
-        config: HwidConfig,
+        config: Config,
         subscriptionUserAgent: String?,
         defaultUserAgent: String,
     ) {
@@ -59,35 +59,35 @@ object HwidKit {
         if (!config.enabled) return
 
         val hwidToSend = config.customHwid?.trim().takeIf { !it.isNullOrEmpty() }
-            ?: HwidDeviceInfo.hardwareId(context)
+            ?: DeviceInfo.hardwareId(context)
         if (hwidToSend.isNullOrEmpty()) return
 
         conn.setRequestProperty("X-HWID", hwidToSend)
 
-        val osRaw = config.customOs?.trim().orEmpty().ifEmpty { HwidDeviceInfo.osValue() }
+        val osRaw = config.customOs?.trim().orEmpty().ifEmpty { DeviceInfo.osValue() }
         conn.setRequestProperty("X-Device-OS", hwidOsHeaderValue(osRaw))
 
-        val osVer = config.customOsVersion?.trim().orEmpty().ifEmpty { HwidDeviceInfo.osVersion() }
+        val osVer = config.customOsVersion?.trim().orEmpty().ifEmpty { DeviceInfo.osVersion() }
         conn.setRequestProperty("X-Ver-OS", osVer)
 
-        val locale = config.customLocale?.trim().orEmpty().ifEmpty { HwidDeviceInfo.locale() }
+        val locale = config.customLocale?.trim().orEmpty().ifEmpty { DeviceInfo.locale() }
         if (locale.isNotEmpty()) {
             conn.setRequestProperty("X-Device-Locale", locale)
         }
 
-        val model = config.customModel?.trim().orEmpty().ifEmpty { HwidDeviceInfo.model() }
+        val model = config.customModel?.trim().orEmpty().ifEmpty { DeviceInfo.model() }
         conn.setRequestProperty("X-Device-Model", model)
     }
 
-    fun applyToConnectionFromV2rayNgSettings(
+    fun applyToConnectionFromSettings(
         conn: HttpURLConnection,
         context: Context,
         subscriptionUserAgent: String?,
         defaultUserAgent: String,
         appVersionName: String,
     ) {
-        val config = HwidSettingsStore.loadHwidConfig(appVersionName)
-            ?: HwidConfig(enabled = false)
+        val config = SettingsStore.loadConfig(appVersionName)
+            ?: Config(enabled = false)
 
         applyToConnection(
             conn = conn,
