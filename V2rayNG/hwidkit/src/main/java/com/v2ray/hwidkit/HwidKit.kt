@@ -20,7 +20,6 @@ object HwidKit {
         val preset = config.userAgentPreset
 
         val presetUa = when (preset) {
-            UserAgentPreset.HAPP_3_8_1 -> "Happ/${HwidDefaults.HAPP_VERSION}"
             UserAgentPreset.HAPP -> {
                 val v = config.happVersion?.trim().orEmpty().ifEmpty { HwidDefaults.HAPP_VERSION }
                 "Happ/$v"
