@@ -7,7 +7,7 @@ data class HwidConfig(
     val customOsVersion: String? = null,
     val customLocale: String? = null,
     val customModel: String? = null,
-    val userAgentPreset: String = "auto",
+    val userAgentPreset: UserAgentPreset = UserAgentPreset.AUTO,
     val customUserAgent: String? = null,
     val happVersion: String? = null,
     val v2rayngVersion: String? = null,

@@ -25,4 +25,5 @@ android {
 
 dependencies {
     implementation(libs.mmkv.static)
+    implementation(libs.preference.ktx)
 }

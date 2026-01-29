@@ -1,0 +1,10 @@
+package com.v2ray.hwidkit
+
+internal object HwidDefaults {
+    const val OS_VALUE_ANDROID = "android"
+
+    const val HAPP_VERSION = "3.8.1"
+    const val V2RAYTUN_PLATFORM = "android"
+    const val FLCLASHX_VERSION = "0.3.0"
+    const val FLCLASHX_PLATFORM = "android"
+}

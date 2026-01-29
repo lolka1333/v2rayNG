@@ -34,16 +34,6 @@ import com.v2ray.hwidkit.V2rayNgCompat
 
 object Utils {
 
-    private const val DEVICE_OS_VALUE_ANDROID = "android"
-    private const val DEVICE_OS_HEADER_ANDROID = "Android"
-    private val HWID_OS_HEADER_MAP = mapOf(
-        "android" to "Android",
-        "ios" to "iOS",
-        "windows" to "Windows",
-        "macos" to "macOS",
-        "linux" to "Linux",
-    )
-
     private val IPV4_REGEX =
         Regex("^([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\\.([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])$")
     private val IPV6_REGEX = Regex("^((?:[0-9A-Fa-f]{1,4}))?((?::[0-9A-Fa-f]{1,4}))*::((?:[0-9A-Fa-f]{1,4}))?((?::[0-9A-Fa-f]{1,4}))*|((?:[0-9A-Fa-f]{1,4}))((?::[0-9A-Fa-f]{1,4})){7}$")
@@ -401,51 +391,6 @@ object Utils {
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to generate device ID", e)
             ""
-        }
-    }
-
-    /**
-     * Get the device ID for HWID.
-     *
-     * @return The device ID.
-     */
-    fun getHardwareId(context: Context): String {
-        return try {
-            Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
-        } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to get HWID", e)
-            ""
-        }
-    }
-
-    /**
-     * Get the device OS name (e.g. android).
-     */
-    fun getDeviceOS(): String {
-        // Safe implementation: always return "android" by default.
-        // Reading System.getProperty("os.name") can cause security violations on some ROMs (MIUI).
-        return DEVICE_OS_VALUE_ANDROID
-    }
-
-    fun getHwidOsHeaderValue(os: String?): String {
-        val v = os?.trim().orEmpty()
-        if (v.isEmpty()) return DEVICE_OS_HEADER_ANDROID
-
-        val key = v.lowercase(Locale.US)
-        return HWID_OS_HEADER_MAP[key] ?: v
-    }
-
-    /**
-     * Get the device Model (e.g. Pixel 6).
-     */
-    fun getDeviceModel(): String {
-        return try {
-             // Build.MODEL is a static field, safe to access.
-             var model = Build.MODEL
-             if (model.isNullOrEmpty()) model = "Unknown"
-             model
-        } catch (e: Exception) {
-            "Unknown"
         }
     }
 
