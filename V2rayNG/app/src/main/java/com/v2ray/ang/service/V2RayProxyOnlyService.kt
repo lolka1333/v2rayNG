@@ -4,11 +4,8 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
-import android.util.Log
-import com.v2ray.ang.AppConfig
+import com.v2ray.ang.contracts.ServiceControl
 import com.v2ray.ang.handler.SettingsManager
-import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.NotificationManager
 import com.v2ray.ang.handler.V2RayServiceManager
 import com.v2ray.ang.util.MyContextWrapper
 import java.lang.ref.SoftReference
@@ -20,11 +17,6 @@ class V2RayProxyOnlyService : Service(), ServiceControl {
     override fun onCreate() {
         super.onCreate()
         V2RayServiceManager.serviceControl = SoftReference(this)
-        try {
-            NotificationManager.showNotification(this, null)
-        } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to show foreground notification in onCreate", e)
-        }
     }
 
     /**
@@ -35,20 +27,7 @@ class V2RayProxyOnlyService : Service(), ServiceControl {
      * @return The start mode.
      */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        try {
-            val guid = MmkvManager.getSelectServer()
-            val config = guid?.let { MmkvManager.decodeServerConfig(it) }
-            NotificationManager.showNotification(this, config)
-        } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to show foreground notification", e)
-        }
-
-        val ok = V2RayServiceManager.startCoreLoop(null)
-        if (!ok) {
-            NotificationManager.cancelNotification(this)
-            stopSelf()
-            return START_NOT_STICKY
-        }
+        V2RayServiceManager.startCoreLoop(null)
         return START_STICKY
     }
 
@@ -58,7 +37,6 @@ class V2RayProxyOnlyService : Service(), ServiceControl {
     override fun onDestroy() {
         super.onDestroy()
         V2RayServiceManager.stopCoreLoop()
-        NotificationManager.cancelNotification(this)
     }
 
     /**

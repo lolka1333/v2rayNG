@@ -15,12 +15,10 @@ import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
 import com.v2ray.ang.extension.toLongEx
 import com.v2ray.ang.handler.MmkvManager
-import com.v2ray.ang.handler.MmkvPreferenceDataStore
+import com.v2ray.ang.helper.MmkvPreferenceDataStore
 import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.util.Utils
 import java.util.concurrent.TimeUnit
-import java.util.Locale
-import java.util.UUID
 
 class SettingsActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,6 +51,7 @@ class SettingsActivity : BaseActivity() {
         private val autoUpdateCheck by lazy { findPreference<CheckBoxPreference>(AppConfig.SUBSCRIPTION_AUTO_UPDATE) }
         private val autoUpdateInterval by lazy { findPreference<EditTextPreference>(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL) }
         private val mode by lazy { findPreference<ListPreference>(AppConfig.PREF_MODE) }
+
         private val hevTunLogLevel by lazy { findPreference<ListPreference>(AppConfig.PREF_HEV_TUNNEL_LOGLEVEL) }
         private val hevTunRwTimeout by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT) }
         private val useHevTun by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_USE_HEV_TUNNEL) }
@@ -113,197 +112,6 @@ class SettingsActivity : BaseActivity() {
                 updateHevTunSettings(newValue as Boolean)
                 true
             }
-
-            val hwidUaPresetPref = findPreference<ListPreference>(AppConfig.PREF_HWID_USER_AGENT_PRESET)
-            val hwidV2raytunPlatformPref = findPreference<ListPreference>(AppConfig.PREF_HWID_V2RAYTUN_PLATFORM)
-            val hwidFlclashxPlatformPref = findPreference<ListPreference>(AppConfig.PREF_HWID_FLCLASHX_PLATFORM)
-            val hwidUaPref = findPreference<EditTextPreference>(AppConfig.PREF_HWID_USER_AGENT)
-            val hwidUaHappVerPref = findPreference<EditTextPreference>(AppConfig.PREF_HWID_USER_AGENT_HAPP_VERSION)
-            val hwidUaV2rayngVerPref = findPreference<EditTextPreference>(AppConfig.PREF_HWID_USER_AGENT_V2RAYNG_VERSION)
-            val hwidUaFlclashxVerPref = findPreference<EditTextPreference>(AppConfig.PREF_HWID_USER_AGENT_FLCLASHX_VERSION)
-            if (MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_V2RAYTUN_PLATFORM, null).isNullOrBlank()) {
-                MmkvManager.encodeSettings(AppConfig.PREF_HWID_V2RAYTUN_PLATFORM, "android")
-                hwidV2raytunPlatformPref?.value = "android"
-            }
-            if (MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_FLCLASHX_PLATFORM, null).isNullOrBlank()) {
-                MmkvManager.encodeSettings(AppConfig.PREF_HWID_FLCLASHX_PLATFORM, "android")
-                hwidFlclashxPlatformPref?.value = "android"
-            }
-
-            fun syncHwidUaUiState() {
-                val enabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_HWID_ENABLED, false)
-                val preset = hwidUaPresetPref?.value ?: MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_USER_AGENT_PRESET, "auto")
-                val showCustomUa = enabled && preset == "custom"
-                val showHappVer = enabled && preset == "happ"
-                val showV2rayngVer = enabled && preset == "v2rayng"
-                val showFlclashxVer = enabled && preset == "flclashx"
-                val showV2raytunPlatform = enabled && preset == "v2raytun"
-                val showFlclashxPlatform = enabled && preset == "flclashx"
-
-                hwidV2raytunPlatformPref?.isVisible = showV2raytunPlatform
-                hwidV2raytunPlatformPref?.isEnabled = showV2raytunPlatform
-
-                hwidFlclashxPlatformPref?.isVisible = showFlclashxPlatform
-                hwidFlclashxPlatformPref?.isEnabled = showFlclashxPlatform
-
-                hwidUaPref?.isVisible = showCustomUa
-                hwidUaPref?.isEnabled = showCustomUa
-
-                hwidUaHappVerPref?.isVisible = showHappVer
-                hwidUaHappVerPref?.isEnabled = showHappVer
-
-                hwidUaV2rayngVerPref?.isVisible = showV2rayngVer
-                hwidUaV2rayngVerPref?.isEnabled = showV2rayngVer
-
-                hwidUaFlclashxVerPref?.isVisible = showFlclashxVer
-                hwidUaFlclashxVerPref?.isEnabled = showFlclashxVer
-            }
-
-            hwidUaPresetPref?.setOnPreferenceChangeListener { _, newValue ->
-                // ListPreference summary will be updated by initPreferenceSummaries
-                val enabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_HWID_ENABLED, false)
-                val preset = newValue?.toString().orEmpty()
-                val idx = hwidUaPresetPref.findIndexOfValue(preset)
-                hwidUaPresetPref.summary = (if (idx >= 0) hwidUaPresetPref.entries[idx] else preset) as CharSequence?
-                val showCustomUa = enabled && preset == "custom"
-                val showHappVer = enabled && preset == "happ"
-                val showV2rayngVer = enabled && preset == "v2rayng"
-                val showFlclashxVer = enabled && preset == "flclashx"
-                val showV2raytunPlatform = enabled && preset == "v2raytun"
-                val showFlclashxPlatform = enabled && preset == "flclashx"
-
-                hwidV2raytunPlatformPref?.isVisible = showV2raytunPlatform
-                hwidV2raytunPlatformPref?.isEnabled = showV2raytunPlatform
-
-                hwidFlclashxPlatformPref?.isVisible = showFlclashxPlatform
-                hwidFlclashxPlatformPref?.isEnabled = showFlclashxPlatform
-
-                hwidUaPref?.isVisible = showCustomUa
-                hwidUaPref?.isEnabled = showCustomUa
-
-                hwidUaHappVerPref?.isVisible = showHappVer
-                hwidUaHappVerPref?.isEnabled = showHappVer
-
-                hwidUaV2rayngVerPref?.isVisible = showV2rayngVer
-                hwidUaV2rayngVerPref?.isEnabled = showV2rayngVer
-
-                hwidUaFlclashxVerPref?.isVisible = showFlclashxVer
-                hwidUaFlclashxVerPref?.isEnabled = showFlclashxVer
-                true
-            }
-            syncHwidUaUiState()
-
-            findPreference<CheckBoxPreference>(AppConfig.PREF_HWID_ENABLED)?.setOnPreferenceChangeListener { _, newValue ->
-                val enabled = newValue as Boolean
-                if (enabled) {
-                    // Execute initialization on the next UI frame to avoid conflicts with Preference dependency updates
-                    view?.post {
-                        try {
-                            val hwidPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_VAL) as? EditTextPreference
-                            if (hwidPref != null && hwidPref.text.isNullOrEmpty()) {
-                                val generatedHwid = UUID.randomUUID().toString().replace("-", "")
-                                hwidPref.text = generatedHwid
-                                hwidPref.summary = generatedHwid
-                                MmkvManager.encodeSettings(AppConfig.PREF_HWID_VAL, generatedHwid)
-                            }
-
-                            val osPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_OS) as? ListPreference
-                            if (osPref != null && osPref.value == null) {
-                                val defaultOS = Utils.getDeviceOS()
-                                osPref.value = defaultOS
-                                osPref.summary = defaultOS
-                                MmkvManager.encodeSettings(AppConfig.PREF_HWID_OS, defaultOS)
-                            }
-
-                            val osVerPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_OS_VER) as? EditTextPreference
-                            if (osVerPref != null && osVerPref.text.isNullOrEmpty()) {
-                                val defaultVer = android.os.Build.VERSION.RELEASE
-                                osVerPref.text = defaultVer
-                                osVerPref.summary = defaultVer
-                                MmkvManager.encodeSettings(AppConfig.PREF_HWID_OS_VER, defaultVer)
-                            }
-
-                            val modelPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_MODEL) as? EditTextPreference
-                            if (modelPref != null && modelPref.text.isNullOrEmpty()) {
-                                val defaultModel = android.os.Build.MODEL
-                                modelPref.text = defaultModel
-                                modelPref.summary = defaultModel
-                                MmkvManager.encodeSettings(AppConfig.PREF_HWID_MODEL, defaultModel)
-                            }
-
-                            val localePref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_LOCALE) as? EditTextPreference
-                            if (localePref != null && localePref.text.isNullOrEmpty()) {
-                                val defaultLocale = Locale.getDefault().language
-                                localePref.text = defaultLocale
-                                localePref.summary = defaultLocale
-                                MmkvManager.encodeSettings(AppConfig.PREF_HWID_LOCALE, defaultLocale)
-                            }
-
-                            val uaPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_USER_AGENT) as? EditTextPreference
-                            if (uaPref != null && uaPref.text.isNullOrEmpty()) {
-                                val defaultUa = "v2rayNG/${com.v2ray.ang.BuildConfig.VERSION_NAME}"
-                                uaPref.text = defaultUa
-                                uaPref.summary = defaultUa
-                                MmkvManager.encodeSettings(AppConfig.PREF_HWID_USER_AGENT, defaultUa)
-                            }
-
-                            val uaPresetPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_USER_AGENT_PRESET) as? ListPreference
-                            if (uaPresetPref != null && uaPresetPref.value == null) {
-                                uaPresetPref.value = "auto"
-                                uaPresetPref.summary = uaPresetPref.entry ?: "auto"
-                                MmkvManager.encodeSettings(AppConfig.PREF_HWID_USER_AGENT_PRESET, "auto")
-                            }
-
-                            val v2raytunPlatformPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_V2RAYTUN_PLATFORM) as? ListPreference
-                            if (v2raytunPlatformPref != null && v2raytunPlatformPref.value == null) {
-                                v2raytunPlatformPref.value = "android"
-                                v2raytunPlatformPref.summary = v2raytunPlatformPref.entry ?: "android"
-                                MmkvManager.encodeSettings(AppConfig.PREF_HWID_V2RAYTUN_PLATFORM, "android")
-                            }
-
-                            val flclashxPlatformPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_FLCLASHX_PLATFORM) as? ListPreference
-                            if (flclashxPlatformPref != null && flclashxPlatformPref.value == null) {
-                                flclashxPlatformPref.value = "android"
-                                flclashxPlatformPref.summary = flclashxPlatformPref.entry ?: "android"
-                                MmkvManager.encodeSettings(AppConfig.PREF_HWID_FLCLASHX_PLATFORM, "android")
-                            }
-
-                            val happVerPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_USER_AGENT_HAPP_VERSION) as? EditTextPreference
-                            if (happVerPref != null && happVerPref.text.isNullOrEmpty()) {
-                                val defaultHappVer = "3.8.1"
-                                happVerPref.text = defaultHappVer
-                                happVerPref.summary = defaultHappVer
-                                MmkvManager.encodeSettings(AppConfig.PREF_HWID_USER_AGENT_HAPP_VERSION, defaultHappVer)
-                            }
-
-                            val v2rayngVerPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_USER_AGENT_V2RAYNG_VERSION) as? EditTextPreference
-                            if (v2rayngVerPref != null && v2rayngVerPref.text.isNullOrEmpty()) {
-                                val defaultV2rayngVer = com.v2ray.ang.BuildConfig.VERSION_NAME
-                                v2rayngVerPref.text = defaultV2rayngVer
-                                v2rayngVerPref.summary = defaultV2rayngVer
-                                MmkvManager.encodeSettings(AppConfig.PREF_HWID_USER_AGENT_V2RAYNG_VERSION, defaultV2rayngVer)
-                            }
-
-                            val flclashxVerPref = findPreference<androidx.preference.Preference>(AppConfig.PREF_HWID_USER_AGENT_FLCLASHX_VERSION) as? EditTextPreference
-                            if (flclashxVerPref != null && flclashxVerPref.text.isNullOrEmpty()) {
-                                val defaultFlclashxVer = "0.3.0"
-                                flclashxVerPref.text = defaultFlclashxVer
-                                flclashxVerPref.summary = defaultFlclashxVer
-                                MmkvManager.encodeSettings(AppConfig.PREF_HWID_USER_AGENT_FLCLASHX_VERSION, defaultFlclashxVer)
-                            }
-
-                            syncHwidUaUiState()
-                        } catch (e: Exception) {
-                            android.util.Log.e(AppConfig.TAG, "Error initializing HWID fields", e)
-                        }
-                    }
-                }
-                if (!enabled) {
-                    syncHwidUaUiState()
-                }
-                true
-            }
-
         }
 
         private fun initPreferenceSummaries() {
@@ -347,43 +155,9 @@ class SettingsActivity : BaseActivity() {
         override fun onStart() {
             super.onStart()
             updateHevTunSettings(MmkvManager.decodeSettingsBool(AppConfig.PREF_USE_HEV_TUNNEL, true))
+
             // Initialize mode-dependent UI states
             updateMode(MmkvManager.decodeSettingsString(AppConfig.PREF_MODE, VPN))
-
-            // Initialize HWID user-agent UI state
-            val hwidUaPresetPref = findPreference<ListPreference>(AppConfig.PREF_HWID_USER_AGENT_PRESET)
-            val hwidV2raytunPlatformPref = findPreference<ListPreference>(AppConfig.PREF_HWID_V2RAYTUN_PLATFORM)
-            val hwidFlclashxPlatformPref = findPreference<ListPreference>(AppConfig.PREF_HWID_FLCLASHX_PLATFORM)
-            val hwidUaPref = findPreference<EditTextPreference>(AppConfig.PREF_HWID_USER_AGENT)
-            val hwidUaHappVerPref = findPreference<EditTextPreference>(AppConfig.PREF_HWID_USER_AGENT_HAPP_VERSION)
-            val hwidUaV2rayngVerPref = findPreference<EditTextPreference>(AppConfig.PREF_HWID_USER_AGENT_V2RAYNG_VERSION)
-            val hwidUaFlclashxVerPref = findPreference<EditTextPreference>(AppConfig.PREF_HWID_USER_AGENT_FLCLASHX_VERSION)
-            val hwidEnabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_HWID_ENABLED, false)
-            val preset = hwidUaPresetPref?.value ?: MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_USER_AGENT_PRESET, "auto")
-            val showCustomUa = hwidEnabled && preset == "custom"
-            val showHappVer = hwidEnabled && preset == "happ"
-            val showV2rayngVer = hwidEnabled && preset == "v2rayng"
-            val showFlclashxVer = hwidEnabled && preset == "flclashx"
-            val showV2raytunPlatform = hwidEnabled && preset == "v2raytun"
-            val showFlclashxPlatform = hwidEnabled && preset == "flclashx"
-
-            hwidV2raytunPlatformPref?.isVisible = showV2raytunPlatform
-            hwidV2raytunPlatformPref?.isEnabled = showV2raytunPlatform
-
-            hwidFlclashxPlatformPref?.isVisible = showFlclashxPlatform
-            hwidFlclashxPlatformPref?.isEnabled = showFlclashxPlatform
-
-            hwidUaPref?.isVisible = showCustomUa
-            hwidUaPref?.isEnabled = showCustomUa
-
-            hwidUaHappVerPref?.isVisible = showHappVer
-            hwidUaHappVerPref?.isEnabled = showHappVer
-
-            hwidUaV2rayngVerPref?.isVisible = showV2rayngVer
-            hwidUaV2rayngVerPref?.isEnabled = showV2rayngVer
-
-            hwidUaFlclashxVerPref?.isVisible = showFlclashxVer
-            hwidUaFlclashxVerPref?.isEnabled = showFlclashxVer
 
             // Initialize mux-dependent UI states
             updateMux(MmkvManager.decodeSettingsBool(AppConfig.PREF_MUX_ENABLED, false))
@@ -393,7 +167,6 @@ class SettingsActivity : BaseActivity() {
 
             // Initialize auto-update interval state
             autoUpdateInterval?.isEnabled = MmkvManager.decodeSettingsBool(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
-
         }
 
         private fun updateMode(value: String?) {
@@ -422,11 +195,6 @@ class SettingsActivity : BaseActivity() {
                     )
                 )
             }
-        }
-
-        private fun updateHevTunSettings(enabled: Boolean) {
-            hevTunLogLevel?.isEnabled = enabled
-            hevTunRwTimeout?.isEnabled = enabled
         }
 
         private fun updateLocalDns(enabled: Boolean) {
@@ -488,6 +256,11 @@ class SettingsActivity : BaseActivity() {
             fragmentPackets?.isEnabled = enabled
             fragmentLength?.isEnabled = enabled
             fragmentInterval?.isEnabled = enabled
+        }
+
+        private fun updateHevTunSettings(enabled: Boolean) {
+            hevTunLogLevel?.isEnabled = enabled
+            hevTunRwTimeout?.isEnabled = enabled
         }
     }
 

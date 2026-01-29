@@ -18,6 +18,8 @@ import androidx.annotation.RequiresApi
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
+import com.v2ray.ang.contracts.ServiceControl
+import com.v2ray.ang.contracts.Tun2SocksControl
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.NotificationManager
 import com.v2ray.ang.handler.SettingsManager
@@ -27,7 +29,7 @@ import com.v2ray.ang.util.Utils
 import java.lang.ref.SoftReference
 
 class V2RayVpnService : VpnService(), ServiceControl {
-    private var mInterface: ParcelFileDescriptor? = null
+    private lateinit var mInterface: ParcelFileDescriptor
     private var isRunning = false
     private var tun2SocksService: Tun2SocksControl? = null
 
@@ -73,15 +75,10 @@ class V2RayVpnService : VpnService(), ServiceControl {
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
         V2RayServiceManager.serviceControl = SoftReference(this)
-        try {
-            NotificationManager.showNotification(this, null)
-        } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to show foreground notification in onCreate", e)
-        }
     }
 
     override fun onRevoke() {
-        stopV2Ray()
+        stopAllService()
     }
 
 //    override fun onLowMemory() {
@@ -91,25 +88,12 @@ class V2RayVpnService : VpnService(), ServiceControl {
 
     override fun onDestroy() {
         super.onDestroy()
-        NotificationManager.cancelNotification(this)
+        NotificationManager.cancelNotification()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        try {
-            val guid = MmkvManager.getSelectServer()
-            val config = guid?.let { MmkvManager.decodeServerConfig(it) }
-            NotificationManager.showNotification(this, config)
-        } catch (e: Exception) {
-            Log.e(AppConfig.TAG, "Failed to show foreground notification", e)
-        }
-        val ok = setupVpnService()
-        if (ok) {
-            startService()
-        } else {
-            NotificationManager.cancelNotification(this)
-            stopSelf()
-            return START_NOT_STICKY
-        }
+        setupVpnService()
+        startService()
         return START_STICKY
         //return super.onStartCommand(intent, flags, startId)
     }
@@ -119,16 +103,19 @@ class V2RayVpnService : VpnService(), ServiceControl {
     }
 
     override fun startService() {
-        val iface = mInterface
-        if (iface == null) {
+        if (mInterface == null) {
             Log.e(AppConfig.TAG, "Failed to create VPN interface")
             return
         }
-        V2RayServiceManager.startCoreLoop(iface)
+        if (!V2RayServiceManager.startCoreLoop(mInterface)) {
+            Log.e(AppConfig.TAG, "Failed to start V2Ray core loop")
+            stopAllService()
+            return
+        }
     }
 
     override fun stopService() {
-        stopV2Ray(true)
+        stopAllService(true)
     }
 
     override fun vpnProtect(socket: Int): Boolean {
@@ -146,18 +133,21 @@ class V2RayVpnService : VpnService(), ServiceControl {
      * Sets up the VPN service.
      * Prepares the VPN and configures it if preparation is successful.
      */
-    private fun setupVpnService(): Boolean {
+    private fun setupVpnService() {
         val prepare = prepare(this)
         if (prepare != null) {
-            return false
+            Log.e(AppConfig.TAG, "VPN preparation failed")
+            stopSelf()
+            return
         }
 
         if (configureVpnService() != true) {
-            return false
+            Log.e(AppConfig.TAG, "VPN configuration failed")
+            stopSelf()
+            return
         }
 
         runTun2socks()
-        return true
     }
 
     /**
@@ -175,7 +165,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
 
         // Close the old interface since the parameters have been changed
         try {
-            mInterface?.close()
+            mInterface.close()
         } catch (ignored: Exception) {
             // ignored
         }
@@ -185,17 +175,12 @@ class V2RayVpnService : VpnService(), ServiceControl {
 
         // Create a new interface using the builder and save the parameters
         try {
-            mInterface = builder.establish()
-            if (mInterface == null) {
-                Log.e(AppConfig.TAG, "Failed to establish VPN interface")
-                stopV2Ray()
-                return false
-            }
+            mInterface = builder.establish()!!
             isRunning = true
             return true
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to establish VPN interface", e)
-            stopV2Ray()
+            stopAllService()
         }
         return false
     }
@@ -325,7 +310,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
         if (SettingsManager.isUsingHevTun()) {
             tun2SocksService = TProxyService(
                 context = applicationContext,
-                vpnInterface = mInterface ?: return,
+                vpnInterface = mInterface,
                 isRunningProvider = { isRunning },
                 restartCallback = { runTun2socks() }
             )
@@ -336,11 +321,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
         tun2SocksService?.startTun2Socks()
     }
 
-    /**
-     * Stops the V2Ray service.
-     * @param isForced Whether to force stop the service.
-     */
-    private fun stopV2Ray(isForced: Boolean = true) {
+    private fun stopAllService(isForced: Boolean = true) {
 //        val configName = defaultDPreference.getPrefString(PREF_CURR_CONFIG_GUID, "")
 //        val emptyInfo = VpnNetworkInfo()
 //        val info = loadVpnNetworkInfo(configName, emptyInfo)!! + (lastNetworkInfo ?: emptyInfo)
@@ -368,7 +349,7 @@ class V2RayVpnService : VpnService(), ServiceControl {
             stopSelf()
 
             try {
-                mInterface?.close()
+                mInterface.close()
             } catch (e: Exception) {
                 Log.e(AppConfig.TAG, "Failed to close VPN interface", e)
             }
