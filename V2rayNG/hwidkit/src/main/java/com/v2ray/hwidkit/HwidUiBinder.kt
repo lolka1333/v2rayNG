@@ -25,10 +25,14 @@ object HwidUiBinder {
 
     fun bind(fragment: PreferenceFragmentCompat) {
         val prefs = prefs(fragment)
+        val context = fragment.requireContext()
 
         prefs.hwidEnabled?.setOnPreferenceChangeListener { _, newValue ->
             val enabled = newValue as? Boolean ?: false
             updateVisibility(prefs, enabled, prefs.uaPreset?.value)
+            if (enabled) {
+                applyDefaults(context, prefs)
+            }
             true
         }
 
@@ -37,11 +41,17 @@ object HwidUiBinder {
             val valueStr = newValue?.toString().orEmpty()
             updateUaPresetSummary(lp, valueStr)
             updateVisibility(prefs, prefs.hwidEnabled?.isChecked == true, valueStr)
+            if (prefs.hwidEnabled?.isChecked == true) {
+                applyDefaults(context, prefs)
+            }
             true
         }
 
         updateUaPresetSummary(prefs.uaPreset, prefs.uaPreset?.value)
         updateVisibility(prefs, prefs.hwidEnabled?.isChecked == true, prefs.uaPreset?.value)
+        if (prefs.hwidEnabled?.isChecked == true) {
+            applyDefaults(context, prefs)
+        }
     }
 
     private fun prefs(fragment: PreferenceFragmentCompat): Prefs {
@@ -92,5 +102,36 @@ object HwidUiBinder {
         prefs.uaFlclashxPlatform?.isVisible = showFlclashx
         prefs.uaFlclashxVersion?.isVisible = showFlclashx
         prefs.uaCustom?.isVisible = showCustom
+    }
+
+    private fun applyDefaults(context: android.content.Context, prefs: Prefs) {
+        setTextIfBlank(prefs.hwidVal, HwidDeviceInfo.hardwareId(context))
+        setListIfBlank(prefs.hwidOs, HwidDeviceInfo.osValue())
+        setTextIfBlank(prefs.hwidOsVer, HwidDeviceInfo.osVersion())
+        setTextIfBlank(prefs.hwidModel, HwidDeviceInfo.model())
+        setTextIfBlank(prefs.hwidLocale, HwidDeviceInfo.locale())
+
+        setTextIfBlank(prefs.uaHappVersion, HwidDefaults.HAPP_VERSION)
+        setTextIfBlank(prefs.uaV2rayngVersion, HwidDeviceInfo.appVersionName(context))
+        setListIfBlank(prefs.uaV2raytunPlatform, HwidDefaults.V2RAYTUN_PLATFORM)
+        setTextIfBlank(prefs.uaFlclashxVersion, HwidDefaults.FLCLASHX_VERSION)
+        setListIfBlank(prefs.uaFlclashxPlatform, HwidDefaults.FLCLASHX_PLATFORM)
+    }
+
+    private fun setTextIfBlank(pref: EditTextPreference?, value: String) {
+        if (pref == null || value.isBlank()) return
+        if (pref.text.isNullOrBlank()) {
+            pref.text = value
+            pref.summary = value
+        }
+    }
+
+    private fun setListIfBlank(pref: ListPreference?, value: String) {
+        if (pref == null || value.isBlank()) return
+        if (pref.value.isNullOrBlank()) {
+            pref.value = value
+        }
+        val idx = pref.findIndexOfValue(pref.value)
+        pref.summary = if (idx >= 0) pref.entries[idx] else pref.value
     }
 }

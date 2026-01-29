@@ -1,8 +1,6 @@
 package com.v2ray.hwidkit
 
 import android.content.Context
-import android.os.Build
-import android.provider.Settings
 import java.net.HttpURLConnection
 import java.util.Locale
 
@@ -60,23 +58,24 @@ object HwidKit {
 
         if (!config.enabled) return
 
-        val hwidToSend = config.customHwid?.trim().takeIf { !it.isNullOrEmpty() } ?: hardwareId(context)
+        val hwidToSend = config.customHwid?.trim().takeIf { !it.isNullOrEmpty() }
+            ?: HwidDeviceInfo.hardwareId(context)
         if (hwidToSend.isNullOrEmpty()) return
 
         conn.setRequestProperty("X-HWID", hwidToSend)
 
-        val osRaw = config.customOs?.trim().orEmpty().ifEmpty { deviceOsValue() }
+        val osRaw = config.customOs?.trim().orEmpty().ifEmpty { HwidDeviceInfo.osValue() }
         conn.setRequestProperty("X-Device-OS", hwidOsHeaderValue(osRaw))
 
-        val osVer = config.customOsVersion?.trim().orEmpty().ifEmpty { Build.VERSION.RELEASE }
+        val osVer = config.customOsVersion?.trim().orEmpty().ifEmpty { HwidDeviceInfo.osVersion() }
         conn.setRequestProperty("X-Ver-OS", osVer)
 
-        val locale = config.customLocale?.trim().orEmpty().ifEmpty { Locale.getDefault().language }
+        val locale = config.customLocale?.trim().orEmpty().ifEmpty { HwidDeviceInfo.locale() }
         if (locale.isNotEmpty()) {
             conn.setRequestProperty("X-Device-Locale", locale)
         }
 
-        val model = config.customModel?.trim().orEmpty().ifEmpty { deviceModel() }
+        val model = config.customModel?.trim().orEmpty().ifEmpty { HwidDeviceInfo.model() }
         conn.setRequestProperty("X-Device-Model", model)
     }
 
@@ -97,24 +96,6 @@ object HwidKit {
             subscriptionUserAgent = subscriptionUserAgent,
             defaultUserAgent = defaultUserAgent,
         )
-    }
-
-    private fun hardwareId(context: Context): String {
-        return try {
-            Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID).orEmpty()
-        } catch (_: Exception) {
-            ""
-        }
-    }
-
-    private fun deviceOsValue(): String = HwidDefaults.OS_VALUE_ANDROID
-
-    private fun deviceModel(): String {
-        return try {
-            Build.MODEL?.ifEmpty { "Unknown" } ?: "Unknown"
-        } catch (_: Exception) {
-            "Unknown"
-        }
     }
 
     private fun hwidOsHeaderValue(os: String?): String {
