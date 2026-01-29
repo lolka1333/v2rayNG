@@ -56,20 +56,6 @@ class SettingsActivity : BaseActivity() {
         private val hevTunRwTimeout by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT) }
         private val useHevTun by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_USE_HEV_TUNNEL) }
 
-        private val hwidEnabled by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_HWID_ENABLED) }
-        private val hwidVal by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HWID_VAL) }
-        private val hwidOs by lazy { findPreference<ListPreference>(AppConfig.PREF_HWID_OS) }
-        private val hwidOsVer by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HWID_OS_VER) }
-        private val hwidModel by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HWID_MODEL) }
-        private val hwidLocale by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HWID_LOCALE) }
-        private val hwidUserAgentPreset by lazy { findPreference<ListPreference>(AppConfig.PREF_HWID_USER_AGENT_PRESET) }
-        private val hwidV2raytunPlatform by lazy { findPreference<ListPreference>(AppConfig.PREF_HWID_V2RAYTUN_PLATFORM) }
-        private val hwidFlclashxPlatform by lazy { findPreference<ListPreference>(AppConfig.PREF_HWID_FLCLASHX_PLATFORM) }
-        private val hwidHappVersion by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HWID_USER_AGENT_HAPP_VERSION) }
-        private val hwidV2rayngVersion by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HWID_USER_AGENT_V2RAYNG_VERSION) }
-        private val hwidFlclashxVersion by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HWID_USER_AGENT_FLCLASHX_VERSION) }
-        private val hwidCustomUserAgent by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HWID_USER_AGENT) }
-
         override fun onCreatePreferences(bundle: Bundle?, s: String?) {
             // Use MMKV as the storage backend for all Preferences
             // This prevents inconsistencies between SharedPreferences and MMKV
@@ -124,20 +110,6 @@ class SettingsActivity : BaseActivity() {
 
             useHevTun?.setOnPreferenceChangeListener { _, newValue ->
                 updateHevTunSettings(newValue as Boolean)
-                true
-            }
-
-            hwidEnabled?.setOnPreferenceChangeListener { _, newValue ->
-                val enabled = newValue as Boolean
-                updateHwidUi(enabled, hwidUserAgentPreset?.value)
-                true
-            }
-            hwidUserAgentPreset?.setOnPreferenceChangeListener { p, newValue ->
-                val lp = p as ListPreference
-                val valueStr = newValue?.toString().orEmpty()
-                val idx = lp.findIndexOfValue(valueStr)
-                lp.summary = (if (idx >= 0) lp.entries[idx] else valueStr) as CharSequence?
-                updateHwidUi(hwidEnabled?.isChecked == true, valueStr)
                 true
             }
         }
@@ -195,11 +167,6 @@ class SettingsActivity : BaseActivity() {
 
             // Initialize auto-update interval state
             autoUpdateInterval?.isEnabled = MmkvManager.decodeSettingsBool(AppConfig.SUBSCRIPTION_AUTO_UPDATE, false)
-
-            updateHwidUi(
-                MmkvManager.decodeSettingsBool(AppConfig.PREF_HWID_ENABLED, false),
-                MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_USER_AGENT_PRESET, "auto")
-            )
         }
 
         private fun updateMode(value: String?) {
@@ -294,30 +261,6 @@ class SettingsActivity : BaseActivity() {
         private fun updateHevTunSettings(enabled: Boolean) {
             hevTunLogLevel?.isEnabled = enabled
             hevTunRwTimeout?.isEnabled = enabled
-        }
-
-        private fun updateHwidUi(enabled: Boolean, preset: String?) {
-            val showGroup = enabled
-            hwidVal?.isVisible = showGroup
-            hwidOs?.isVisible = showGroup
-            hwidOsVer?.isVisible = showGroup
-            hwidModel?.isVisible = showGroup
-            hwidLocale?.isVisible = showGroup
-            hwidUserAgentPreset?.isVisible = showGroup
-
-            val p = preset?.trim().orEmpty().ifEmpty { "auto" }
-            val showHapp = showGroup && (p == "happ" || p == "happ_3_8_1")
-            val showV2rayng = showGroup && p == "v2rayng"
-            val showV2raytun = showGroup && p == "v2raytun"
-            val showFlclashx = showGroup && p == "flclashx"
-            val showCustom = showGroup && p == "custom"
-
-            hwidHappVersion?.isVisible = showHapp
-            hwidV2rayngVersion?.isVisible = showV2rayng
-            hwidV2raytunPlatform?.isVisible = showV2raytun
-            hwidFlclashxPlatform?.isVisible = showFlclashx
-            hwidFlclashxVersion?.isVisible = showFlclashx
-            hwidCustomUserAgent?.isVisible = showCustom
         }
     }
 

@@ -20,7 +20,6 @@ import com.v2ray.ang.fmt.VlessFmt
 import com.v2ray.ang.fmt.VmessFmt
 import com.v2ray.ang.fmt.WireguardFmt
 import com.v2ray.ang.util.HttpUtil
-import com.v2ray.ang.util.HappCrypt
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.QRCodeDecoder
 import com.v2ray.ang.util.Utils
@@ -52,18 +51,7 @@ object AngConfigManager {
     }
 
     private fun preprocessHappLinks(servers: String?): String? {
-        if (servers.isNullOrEmpty()) return servers
-
-        val out = ArrayList<String>()
-        servers.lines().forEach { line ->
-            val decrypted = HappCrypt.tryDecrypt(line)
-            if (decrypted.isNullOrEmpty()) {
-                out.add(line)
-            } else {
-                decrypted.lines().forEach { out.add(it) }
-            }
-        }
-        return out.joinToString("\n")
+        return servers
     }
 
     /**
@@ -428,8 +416,7 @@ object AngConfigManager {
             if (!it.subscription.enabled) {
                 return 0
             }
-            val rawUrl = HttpUtil.toIdnUrl(it.subscription.url)
-            val url = HappCrypt.tryDecrypt(rawUrl) ?: rawUrl
+            val url = HttpUtil.toIdnUrl(it.subscription.url)
             if (!Utils.isValidUrl(url)) {
                 return 0
             }

@@ -16,6 +16,7 @@ import android.util.Patterns
 import android.webkit.URLUtil
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import com.google.android.material.color.MaterialColors
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
@@ -29,6 +30,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
+import com.v2ray.hwidkit.V2rayNgCompat
 
 object Utils {
 
@@ -276,10 +278,12 @@ object Utils {
     fun isValidUrl(value: String?): Boolean {
         if (value.isNullOrEmpty()) return false
 
+        val effective = V2rayNgCompat.normalizeSubscriptionUrl(value) ?: value
+
         return try {
-            Patterns.WEB_URL.matcher(value).matches() ||
-                    Patterns.DOMAIN_NAME.matcher(value).matches() ||
-                    URLUtil.isValidUrl(value)
+            Patterns.WEB_URL.matcher(effective).matches() ||
+                    Patterns.DOMAIN_NAME.matcher(effective).matches() ||
+                    URLUtil.isValidUrl(effective)
         } catch (e: Exception) {
             Log.e(AppConfig.TAG, "Failed to validate URL", e)
             false
@@ -518,13 +522,15 @@ object Utils {
     fun isValidSubUrl(value: String?): Boolean {
         if (value.isNullOrEmpty()) return false
 
+        val effective = V2rayNgCompat.normalizeSubscriptionUrl(value) ?: value
+
         try {
-            if (URLUtil.isHttpsUrl(value)) return true
-            if (URLUtil.isHttpUrl(value)) {
-                if (value.contains(LOOPBACK)) return true
+            if (URLUtil.isHttpsUrl(effective)) return true
+            if (URLUtil.isHttpUrl(effective)) {
+                if (effective.contains(LOOPBACK)) return true
 
                 //Check private ip address
-                val uri = URI(fixIllegalUrl(value))
+                val uri = URI(fixIllegalUrl(effective))
                 if (isIpAddress(uri.host)) {
                     AppConfig.PRIVATE_IP_LIST.forEach {
                         if (isIpInCidr(uri.host, it)) return true

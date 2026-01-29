@@ -4,6 +4,8 @@ import android.util.Log
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
+import com.v2ray.hwidkit.HwidKit
+import com.v2ray.hwidkit.V2rayNgCompat
 import com.v2ray.ang.util.Utils.encode
 import com.v2ray.ang.util.Utils.urlDecode
 import java.io.IOException
@@ -16,7 +18,6 @@ import java.net.MalformedURLException
 import java.net.Proxy
 import java.net.URI
 import java.net.URL
-import java.util.Locale
 
 object HttpUtil {
 
@@ -29,13 +30,17 @@ object HttpUtil {
      * @return The URL string with the domain part converted to ASCII-compatible (Punycode) format.
      */
     fun toIdnUrl(str: String): String {
-        val url = URL(str)
-        val host = url.host
-        val asciiHost = IDN.toASCII(url.host, IDN.ALLOW_UNASSIGNED)
-        if (host != asciiHost) {
-            return str.replace(host, asciiHost)
-        } else {
-            return str
+        return try {
+            val url = URL(str)
+            val host = url.host
+            val asciiHost = IDN.toASCII(url.host, IDN.ALLOW_UNASSIGNED)
+            if (host != asciiHost) {
+                str.replace(host, asciiHost)
+            } else {
+                str
+            }
+        } catch (_: Exception) {
+            str
         }
     }
 
@@ -136,121 +141,19 @@ object HttpUtil {
 
         while (redirects++ < maxRedirects) {
             if (currentUrl == null) continue
-            val conn = createProxyConnection(currentUrl, httpPort, timeout, timeout) ?: continue
-            // User-Agent priority:
-            // 1) subscription-level userAgent (SubEditActivity)
-            // 2) HWID feature preset UA (pref_hwid_user_agent_preset) when HWID feature is enabled
-            // 3) default v2rayNG/<version>
-            val isBypassEnabled = com.v2ray.ang.handler.MmkvManager.decodeSettingsBool(AppConfig.PREF_HWID_ENABLED, false)
-            val hwidUserAgentPreset = if (isBypassEnabled) {
-                com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_USER_AGENT_PRESET, "auto")
-            } else {
-                "auto"
-            }
-            val hwidCustomUserAgent = if (isBypassEnabled && hwidUserAgentPreset == "custom") {
-                com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_USER_AGENT)
-            } else {
-                null
-            }
-            val hwidPresetUserAgent = if (isBypassEnabled) {
-                when (hwidUserAgentPreset) {
-                    "happ_3_8_1" -> "Happ/3.8.1" // backward compatibility
-                    "happ" -> {
-                        val ver = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(
-                            AppConfig.PREF_HWID_USER_AGENT_HAPP_VERSION,
-                            "3.8.1",
-                        )
-                        if (ver.isNullOrBlank()) "Happ" else "Happ/${ver.trim()}"
-                    }
-                    "v2rayng" -> {
-                        val ver = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(
-                            AppConfig.PREF_HWID_USER_AGENT_V2RAYNG_VERSION,
-                            BuildConfig.VERSION_NAME,
-                        )
-                        if (ver.isNullOrBlank()) "v2rayNG" else "v2rayNG/${ver.trim()}"
-                    }
-                    "v2raytun" -> {
-                        val platform = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(
-                            AppConfig.PREF_HWID_V2RAYTUN_PLATFORM,
-                            "android",
-                        )
-                        val p = platform?.trim().orEmpty().ifEmpty { "android" }
-                        "v2raytun/${p}"
-                    }
-                    "flclashx" -> {
-                        val platform = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(
-                            AppConfig.PREF_HWID_FLCLASHX_PLATFORM,
-                            "android",
-                        )
-                        val p = platform?.trim().orEmpty().ifEmpty { "android" }
-                        val ver = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(
-                            AppConfig.PREF_HWID_USER_AGENT_FLCLASHX_VERSION,
-                            "0.3.0",
-                        )
-                        val v = ver?.trim().orEmpty()
-                        if (v.isEmpty()) {
-                            "FlClash X Platform/${p}"
-                        } else {
-                            "FlClash X/v${v} Platform/${p}"
-                        }
-                    }
-                    "custom" -> null
-                    else -> null
-                }
-            } else {
-                null
-            }
-            val finalUserAgent = when {
-                !userAgent.isNullOrBlank() -> userAgent
-                !hwidPresetUserAgent.isNullOrBlank() -> hwidPresetUserAgent
-                !hwidCustomUserAgent.isNullOrBlank() -> hwidCustomUserAgent
-                else -> "v2rayNG/${BuildConfig.VERSION_NAME}"
-            }
-            conn.setRequestProperty("User-agent", finalUserAgent)
+            val effectiveUrl = V2rayNgCompat.normalizeSubscriptionUrl(currentUrl) ?: currentUrl
+            val conn = createProxyConnection(effectiveUrl, httpPort, timeout, timeout) ?: continue
 
-            // Inject HWID headers for Remnawave
             try {
-                if (isBypassEnabled) {
-                    val customHwid = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_VAL)
-                    val hwidToSend = customHwid.orEmpty()
-
-                    if (hwidToSend.isNotEmpty()) {
-                        conn.setRequestProperty("X-HWID", hwidToSend)
-                        
-                        // Custom or Default OS
-                        val customOs = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_OS)
-                        val osToSendRaw = if (!customOs.isNullOrEmpty()) customOs else Utils.getDeviceOS()
-                        conn.setRequestProperty("X-Device-OS", Utils.getHwidOsHeaderValue(osToSendRaw))
-
-                        // Custom or Default OS Version
-                        val customVer = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_OS_VER)
-                        val verToSend = if (!customVer.isNullOrEmpty()) customVer else android.os.Build.VERSION.RELEASE
-                        conn.setRequestProperty("X-Ver-OS", verToSend)
-
-                        // Custom or Default Locale
-                        val customLocale = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_LOCALE)
-                        val localeToSend = if (!customLocale.isNullOrBlank()) customLocale.trim() else Locale.getDefault().language
-                        if (localeToSend.isNotEmpty()) {
-                            conn.setRequestProperty("X-Device-Locale", localeToSend)
-                        }
-
-                        // Custom or Default Model
-                        val customModel = com.v2ray.ang.handler.MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_MODEL)
-                        val modelToSend = if (!customModel.isNullOrEmpty()) customModel else Utils.getDeviceModel()
-                        conn.setRequestProperty("X-Device-Model", modelToSend)
-                    }
-                } else {
-                    val realHwid = Utils.getHardwareId(com.v2ray.ang.AngApplication.application)
-                     if (realHwid.isNotEmpty()) {
-                        conn.setRequestProperty("X-HWID", realHwid)
-                        conn.setRequestProperty("X-Device-OS", Utils.getHwidOsHeaderValue(Utils.getDeviceOS()))
-                        conn.setRequestProperty("X-Ver-OS", android.os.Build.VERSION.RELEASE)
-                        conn.setRequestProperty("X-Device-Locale", Locale.getDefault().language)
-                        conn.setRequestProperty("X-Device-Model", Utils.getDeviceModel())
-                     }
-                }
+                HwidKit.applyToConnectionFromV2rayNgSettings(
+                    conn = conn,
+                    context = com.v2ray.ang.AngApplication.application,
+                    subscriptionUserAgent = userAgent,
+                    defaultUserAgent = "v2rayNG/${BuildConfig.VERSION_NAME}",
+                    appVersionName = BuildConfig.VERSION_NAME,
+                )
             } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "Failed to set HWID headers", e)
+                Log.e(AppConfig.TAG, "Failed to set HWID/User-Agent headers", e)
             }
 
             conn.connect()
@@ -268,7 +171,8 @@ object HttpUtil {
                 }
 
                 else -> try {
-                    return conn.inputStream.use { it.bufferedReader().readText() }
+                    val text = conn.inputStream.use { it.bufferedReader().readText() }
+                    return V2rayNgCompat.expandHappLinksInText(text) ?: text
                 } finally {
                     conn.disconnect()
                 }
