@@ -23,10 +23,10 @@ import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.QRCodeDecoder
 import com.v2ray.ang.util.Utils
-import com.v2ray.devicekit.Compat
 import java.net.URI
 
 object AngConfigManager {
+
 
     /**
      * Shares the configuration to the clipboard.
@@ -49,10 +49,6 @@ object AngConfigManager {
             return -1
         }
         return 0
-    }
-
-    private fun preprocessHappLinks(servers: String?): String? {
-        return Compat.expandHappLinksInText(servers) ?: servers
     }
 
     /**
@@ -164,19 +160,17 @@ object AngConfigManager {
      * @return A pair containing the number of configurations and subscriptions imported.
      */
     fun importBatchConfig(server: String?, subid: String, append: Boolean): Pair<Int, Int> {
-        val preprocessedServer = preprocessHappLinks(server)
-
-        var count = parseBatchConfig(Utils.decode(preprocessedServer), subid, append)
+        var count = parseBatchConfig(Utils.decode(server), subid, append)
         if (count <= 0) {
-            count = parseBatchConfig(preprocessedServer, subid, append)
+            count = parseBatchConfig(server, subid, append)
         }
         if (count <= 0) {
-            count = parseCustomConfigServer(preprocessedServer, subid)
+            count = parseCustomConfigServer(server, subid)
         }
 
-        var countSub = parseBatchSubscription(preprocessedServer)
+        var countSub = parseBatchSubscription(server)
         if (countSub <= 0) {
-            countSub = parseBatchSubscription(Utils.decode(preprocessedServer))
+            countSub = parseBatchSubscription(Utils.decode(server))
         }
         if (countSub > 0) {
             updateConfigViaSubAll()
@@ -469,14 +463,12 @@ object AngConfigManager {
      * @return The number of configurations parsed.
      */
     private fun parseConfigViaSub(server: String?, subid: String, append: Boolean): Int {
-        val preprocessedServer = preprocessHappLinks(server)
-
-        var count = parseBatchConfig(Utils.decode(preprocessedServer), subid, append)
+        var count = parseBatchConfig(Utils.decode(server), subid, append)
         if (count <= 0) {
-            count = parseBatchConfig(preprocessedServer, subid, append)
+            count = parseBatchConfig(server, subid, append)
         }
         if (count <= 0) {
-            count = parseCustomConfigServer(preprocessedServer, subid)
+            count = parseCustomConfigServer(server, subid)
         }
         return count
     }

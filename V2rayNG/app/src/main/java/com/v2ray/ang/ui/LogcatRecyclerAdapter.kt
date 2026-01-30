@@ -19,6 +19,7 @@ class LogcatRecyclerAdapter(
         try {
             val logs = viewModel.getAll()
             val log = logs[position]
+
             if (log.isEmpty()) {
                 holder.itemSubSettingBinding.logTag.text = ""
                 holder.itemSubSettingBinding.logContent.text = ""

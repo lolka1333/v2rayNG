@@ -46,8 +46,7 @@ class UrlSchemeActivity : BaseActivity() {
                         }
 
                         else -> {
-                            val uri: Uri? = intent.data
-                            parseUri(uri?.toString().orEmpty(), uri?.fragment)
+                            toastError(R.string.toast_failure)
                         }
                     }
                 }
@@ -66,11 +65,7 @@ class UrlSchemeActivity : BaseActivity() {
         }
         Log.i(AppConfig.TAG, uriString)
 
-        var decodedUrl = if (uriString.startsWith("happ://crypt4/")) {
-            Uri.decode(uriString)
-        } else {
-            URLDecoder.decode(uriString, "UTF-8")
-        }
+        var decodedUrl = URLDecoder.decode(uriString, "UTF-8")
         val uri = Uri.parse(decodedUrl)
         if (uri != null) {
             if (uri.fragment.isNullOrEmpty() && !fragment.isNullOrEmpty()) {

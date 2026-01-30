@@ -4,8 +4,6 @@ import android.util.Log
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.LOOPBACK
 import com.v2ray.ang.BuildConfig
-import com.v2ray.devicekit.Kit
-import com.v2ray.devicekit.Compat
 import com.v2ray.ang.util.Utils.encode
 import com.v2ray.ang.util.Utils.urlDecode
 import java.io.IOException
@@ -30,17 +28,13 @@ object HttpUtil {
      * @return The URL string with the domain part converted to ASCII-compatible (Punycode) format.
      */
     fun toIdnUrl(str: String): String {
-        return try {
-            val url = URL(str)
-            val host = url.host
-            val asciiHost = IDN.toASCII(url.host, IDN.ALLOW_UNASSIGNED)
-            if (host != asciiHost) {
-                str.replace(host, asciiHost)
-            } else {
-                str
-            }
-        } catch (_: Exception) {
-            str
+        val url = URL(str)
+        val host = url.host
+        val asciiHost = IDN.toASCII(url.host, IDN.ALLOW_UNASSIGNED)
+        if (host != asciiHost) {
+            return str.replace(host, asciiHost)
+        } else {
+            return str
         }
     }
 
@@ -141,21 +135,13 @@ object HttpUtil {
 
         while (redirects++ < maxRedirects) {
             if (currentUrl == null) continue
-            val effectiveUrl = Compat.decryptSubscriptionUrl(currentUrl) ?: currentUrl
-            val conn = createProxyConnection(effectiveUrl, httpPort, timeout, timeout) ?: continue
-
-            try {
-                Kit.applyToConnectionFromSettings(
-                    conn = conn,
-                    context = com.v2ray.ang.AngApplication.application,
-                    subscriptionUserAgent = userAgent,
-                    defaultUserAgent = "v2rayNG/${BuildConfig.VERSION_NAME}",
-                    appVersionName = BuildConfig.VERSION_NAME,
-                )
-            } catch (e: Exception) {
-                Log.e(AppConfig.TAG, "Failed to set HWID/User-Agent headers", e)
+            val conn = createProxyConnection(currentUrl, httpPort, timeout, timeout) ?: continue
+            val finalUserAgent = if (userAgent.isNullOrBlank()) {
+                "v2rayNG/${BuildConfig.VERSION_NAME}"
+            } else {
+                userAgent
             }
-
+            conn.setRequestProperty("User-agent", finalUserAgent)
             conn.connect()
 
             val responseCode = conn.responseCode
@@ -171,8 +157,7 @@ object HttpUtil {
                 }
 
                 else -> try {
-                    val text = conn.inputStream.use { it.bufferedReader().readText() }
-                    return Compat.expandHappLinksInText(text) ?: text
+                    return conn.inputStream.use { it.bufferedReader().readText() }
                 } finally {
                     conn.disconnect()
                 }
