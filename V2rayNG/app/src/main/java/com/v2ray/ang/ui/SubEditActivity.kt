@@ -93,6 +93,8 @@ class SubEditActivity : BaseActivity() {
         if (subItem.url.isNotEmpty()) {
             val validateUrl = Compat.decryptSubscriptionUrl(subItem.url) ?: subItem.url
 
+            subItem.url = validateUrl
+
             if (!Utils.isValidUrl(validateUrl)) {
                 toast(R.string.toast_invalid_url)
                 return false
