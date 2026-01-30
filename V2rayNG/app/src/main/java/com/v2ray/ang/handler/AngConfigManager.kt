@@ -23,6 +23,7 @@ import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.QRCodeDecoder
 import com.v2ray.ang.util.Utils
+import com.v2ray.devicekit.Compat
 import java.net.URI
 
 object AngConfigManager {
@@ -411,7 +412,8 @@ object AngConfigManager {
             if (!it.subscription.enabled) {
                 return 0
             }
-            val url = HttpUtil.toIdnUrl(it.subscription.url)
+            val decryptedUrl = Compat.decryptSubscriptionUrl(it.subscription.url) ?: it.subscription.url
+            val url = HttpUtil.toIdnUrl(decryptedUrl)
             if (!Utils.isValidUrl(url)) {
                 return 0
             }
