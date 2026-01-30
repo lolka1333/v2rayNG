@@ -196,7 +196,8 @@ object AngConfigManager {
             servers.lines()
                 .distinct()
                 .forEach { str ->
-                    if (Utils.isValidSubUrl(str)) {
+                    val decrypted = Compat.decryptSubscriptionUrl(str)
+                    if (Utils.isValidSubUrl(decrypted)) {
                         count += importUrlAsSubscription(str)
                     }
                 }
